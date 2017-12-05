@@ -1,0 +1,390 @@
+.b-nav-bar{
+    margin:30px;
+}
+.product-cat-nav{
+    margin: 30px;
+}
+.form-data{
+    margin: 30px;
+}
+hr{
+    margin-left: 30px;
+    width:1660px;
+    background-color: #000000 ;
+}
+.xieyi{
+    margin-left: 710px;
+    margin-bottom: 10px;
+}
+.share-btns{
+    float: right;
+    margin-right: 280px;
+    margin-bottom: 15px;
+}
+.product_search{
+    float: left;
+    margin-bottom: 20px;
+}
+.read-btn{
+    margin:20px 0 5px 400px!important;
+}
+.star{
+    padding: 40px 100px;
+    height: 0px;
+}
+.stared{
+    padding: 10px 100px;
+    height: 0px;
+}
+.stared span{
+
+    float: left;
+    font-size: 22px;
+    font-family: 微软雅黑;
+    margin-right: 10px;
+
+}
+.stared .star-tr td{
+    padding-right: 7px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.eva-div{
+    float: left;
+    font-size: 22px;
+    padding-right: 7px;
+    color: red;
+}
+.star span{
+
+    float: left;
+    font-size: 22px;
+    font-family: 微软雅黑;
+    margin-right: 10px;
+
+}
+
+.star .star-tr td{
+    padding-right: 7px;
+    font-size: 22px;
+    cursor: pointer;
+}
+.eva-content{
+    padding: 40px 100px;
+}
+.eva-content span{
+
+    float: left;
+    font-size: 22px;
+    font-family: 微软雅黑;
+    margin-right: 10px;
+}
+.eva-btn{
+    display: inline-block;
+    background-color: #1E9FFF;
+    height: 38px;
+    padding:0 18px;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 14px;
+    border: none;
+    border-radius:2px;
+    cursor: pointer;
+    color: white;
+    margin:5px 204px;
+}
+.eva-btn p{
+    margin-top: 9px;
+}
+.eva-select{
+    float: right;
+    margin-right: 265px;
+}
+.eva-select select{
+    padding-right: 30px;
+    cursor: pointer;
+    display: block;
+    width:100%;
+    padding-left: 10px;
+    height: 38px;
+    border:1px solid #e6e6e6;
+    border-radius: 2px;
+}
+.label-title{
+    float: left;
+    display: block;
+    padding:9px 7px;
+    width:45px;
+    font-weight: 400;
+    text-align: right;
+}
+.time{
+    display: none;
+}
+.admin-li{
+    width: 1480px;
+    height: 700px;
+    margin:50px 100px;
+    font-size: 18px;
+}
+.admin-li table{
+    line-height:50px;
+    margin-left: 20px;
+    text-indent:50px;
+    width: 600px;
+}
+.admin-li span{
+    padding-left: 10px;
+    display: block;
+    float: right;
+    margin-right: 1090px;
+}
+.admin-btn{
+    float: right;
+    margin-right: 400px;
+}
+.layui-nav-tree li{
+    cursor: pointer!important;
+}
+.admin-img{
+    width: 290px;
+}
+.msg-btn{
+    margin-bottom: 25px!important;
+}
+label{
+    width:80px!important;
+}
+.admin-li-table{
+    width: 1480px;
+    height: 20px;
+    border: 1px solid white;
+    margin:50px 100px;
+    font-size: 18px;
+}
+.form-data-table{
+    margin-left: 95px;
+}
+.child-btns{
+    margin-left: 1105px;
+    margin-bottom: 25px;
+}
+#childAdd{
+    margin-top: 25px;
+    margin-right: 65px;
+}
+.child-ul li{
+    margin-left: 110px;
+}
+.feedback-list{
+    margin-top: 80px;
+    margin-left: 50px;
+}
+.feedback-list hr{
+    width: 1000px;
+}
+.layui-table td, .layui-table th, .layui-table-header, .layui-table-tool, .layui-table-view, .layui-table[lay-skin=row], .layui-table[lay-skin=line]{
+    border: 1px solid white!important;
+}
+.label-eva{
+    margin-left: 20px;
+    font-size: 18px;
+    color: red;
+}
+.black-btns{
+    float: right;
+    margin-right: 240px;
+}
+#black-img{
+    width: 800px;
+    margin-left: 80px;
+}
+#black-img .black-img{
+    width: 200px;
+    padding-left:10px
+}
+#layui-upload-black .layui-quote-nm{
+    border-color:#fff!important;
+}
+#black-form{
+    margin-top: 30px;
+    width: 850px;
+}
+.black-btn{
+    margin-left: 260px;
+}
+.search-alert{
+    display: none;
+}
+.shenming{
+    border:1px solid #000000;
+    height: 200px;
+    width: 800px;
+    margin-left: 50px;
+    overflow: hidden;
+}
+.shenming span{
+    padding-left: 15px;
+    line-height:40px;
+    font-size: 12.5px;
+}
+.integral{
+    margin-left: 80%;
+    font-size: 20px;
+}
+.share-form{
+    display: none;
+}
+.share-form-data{
+    margin-top: 10px;
+}
+.ruzhu a{
+    color: #fff!important;
+}
+.ruzhu{
+    margin-left: 6.5rem;
+    cursor: pointer;
+}
+.beg-settled-box{
+    width:725px;
+    height: 430px;
+    margin:195px auto;
+    background-color: rgba(255, 255, 255, 0.407843);
+    border-radius: 10px;
+    color: aliceblue;
+}
+
+
+.beg-settled-box header {
+    height: 39px;
+    padding: 10px;
+    border-bottom: 1px solid aliceblue;
+}
+.beg-settled-box header h1 {
+    text-align: center;
+    font-size: 25px;
+    line-height: 40px;
+}
+.beg-settled-box .beg-login-main {
+    height: 185px;
+    padding: 30px 90px 0;
+}
+.beg-settled-box footer {
+    height: 35px;
+    padding: 10px 10px 0 10px;
+    margin-top: 100px;
+}
+.beg-settled-box footer p {
+    line-height: 35px;
+    text-align: center;
+}
+.settled-input{
+    display: block;
+    width: 70%;
+    height:35px;
+}
+.settled-btn-primary{
+    border: 1px solid #c9c9c9;
+    background-color: #fff;
+    color: #555;
+    width: 350px;
+    margin-right: 100px;
+}
+
+.settled-phone{
+    float: left;
+}
+.layui-btn{
+    margin-left: 2px!important;
+    margin-top: 5px!important;
+}
+.layui-btn:hover{
+    color: #000!important;
+}
+.message-time{
+    float: right;
+    margin: 10px 220px;
+}
+.message-list{
+    margin: 25px 70px;
+    line-height:30px;
+    font-size: 16px;
+}
+.message-create-time{
+    float: right;
+}
+#read-more-btn{
+    width: 58px!important;
+    height: 28px!important;
+    background-color: #009688!important;
+    color: #fff!important;
+    border: none!important;
+    border-radius: 2px!important;
+}
+.share-basic{
+    margin-top: 20px;
+}
+.share-input{
+    width: 380px!important;
+}
+.share-select{
+    height: 38px;
+    width: 380px;
+    line-height: 1.3;
+    border: 1px solid #e6e6e6;
+    border-radius: 2px
+}
+.share-btn{
+    margin-left: 240px!important;
+}
+.layui-table-view{
+    width: 100%!important;
+}
+.yinlian-hr{
+    margin-left: 0!important;
+    width: 80%!important;
+    height: 2px!important;
+}
+.yinlian-message-1{
+    margin-left: 5%;
+    margin-top: 2%;
+}
+.yinlian-message-2{
+    margin-left: 5%;
+}
+.dingdan-message div{
+    margin-top: 8px;
+}
+.share-select-small{
+    width: 140px;
+    height: 38px;
+    line-height: 1.3;
+    border-radius: 2px
+}
+.share-img{
+    width: 200px;
+    padding-left: 20px;
+}
+.share-textarea{
+    width: 400px!important;
+    height: 150px!important;
+}
+.cat-btn{
+    background-color: #e02b3d!important;
+}
+.layui-btn-primary{
+    background-color: #009688!important;
+    color: #ffffff;
+}
+.share-page>ul>li{
+    display: inline;
+}
+.share-page>ul>li>a{
+    position: relative;
+    float: left;
+    padding: 6px 12px;
+    line-height: 1.42857143;
+    text-decoration: none;
+    border: 1px solid #ddd;
+}

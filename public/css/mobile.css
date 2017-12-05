@@ -1,0 +1,456 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font: normal 400 14px/1.5 "Microsoft Yahei", Helvetica, arial, sans-serif;
+  color: #333;
+  background: #FFF;
+}
+
+.bodyInd {
+  max-width: 750px;
+  margin: 0 auto;
+  height: 100%;
+}
+
+.content {
+  width: 100%;
+  height: 100%;
+}
+
+html {
+  font-size: 37.5px;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+a {
+  color: #000;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  border: none;
+  outline: none;
+}
+
+.successTow {
+  width: 100%;
+  height: 100%;
+  background: url("/img/C_download@1x.png") no-repeat center top;
+  background-size: 100% 100%;
+  position: relative;
+}
+
+.successTow span {
+  width: 100%;
+  height: 68%;
+  display: block;
+}
+
+.successTow div {
+  width: 4.8rem;
+  height: 3.33333333rem;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.successTow div .dowloadOne {
+  display: block;
+  border-radius: 4px;
+  width: 100%;
+  background: url("/img/pingguo@2x.png") no-repeat center;
+  background-size: 100% 1.06666667rem;
+  height: 1.06666667rem;
+}
+
+.successTow div .dowloadTow {
+  border-radius: 4px;
+  display: block;
+  width: 100%;
+  height: 1.06666667rem;
+  background: url("/img/anzhuo@2x.png") no-repeat center;
+  background-size: 100% 1.06666667rem;
+}
+
+.success {
+  width: 100%;
+  height: 100%;
+  background: url("/img/B_download@1x.png") no-repeat center top;
+  background-size: 100% 100%;
+  position: relative;
+}
+
+.success span {
+  width: 100%;
+  height: 68%;
+  display: block;
+}
+
+.success div {
+  width: 4.8rem;
+  height: 3.33333333rem;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.success div .dowloadOne {
+  display: block;
+  border-radius: 4px;
+  width: 100%;
+  background: url("/img/pingguo@2x.png") no-repeat center;
+  background-size: 100% 1.06666667rem;
+  height: 1.06666667rem;
+}
+
+.success div .dowloadTow {
+  border-radius: 4px;
+  display: block;
+  width: 100%;
+  height: 1.06666667rem;
+  background: url("/img/anzhuo@2x.png") no-repeat center;
+  background-size: 100% 1.06666667rem;
+}
+
+.register {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.register .reg_titel {
+  width: 100%;
+  text-align: center;
+  font-family: PingFang-SC-Regular;
+  font-size: 14px;
+  color: #AA202E;
+  letter-spacing: 0.32px;
+  padding: 0.32rem;
+}
+
+.register .register-top {
+  width: 100%;
+}
+
+.register .register-top li {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 1.41333333rem;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  padding: 0 0.4rem;
+  border-top: 1px solid #f1f1f1;
+  font-size: 0.45333333rem;
+}
+
+.register .register-top li .inputboxone {
+  border-bottom: 1px solid #f1f1f1 !important;
+}
+
+.register .register-top li input {
+  width: 100%;
+  height: 1.01333333rem;
+  padding: 0.29333333rem;
+  opacity: 0.2;
+  border: 1px solid #979797 !important;
+  border-radius: 2px;
+}
+
+.register .register-top li h4 {
+  -webkit-box-flex: 0;
+      -ms-flex: none;
+          flex: none;
+  width: 2.13333333rem;
+  font-size: 0.45333333rem;
+  font-weight: 600;
+}
+
+.register .register-top li .li-inp {
+  outline: none;
+  border: none;
+  text-align: left;
+}
+
+.register .register-top li .codeBox {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+
+.register .register-top li .codeBox h4 {
+  font-size: 0.45333333rem;
+  font-weight: 600;
+}
+
+.register .register-top li .codeBox .codeBox-input {
+  width: 60%;
+  outline: none;
+  border: none;
+}
+
+.register .register-top li .code {
+  -webkit-box-flex: 0;
+      -ms-flex: none;
+          flex: none;
+  background: #B31C2E;
+  display: block;
+  width: 2.34666667rem;
+  height: 0.98666667rem;
+  line-height: 0.98666667rem;
+  text-align: center;
+  font-size: 0.4rem;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.register .contentbox {
+  margin: 0.24rem 0.58666667rem 0.4rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 0.8rem 0.8rem 0;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  background: #F4F4F4;
+  height: 4.8rem;
+}
+
+.register .contentbox div {
+  overflow-y: auto;
+}
+
+.register .contentbox h3 {
+  font-size: 0.4rem;
+  width: 100%;
+  text-align: center;
+  color: #141417;
+  margin-bottom: 0.4rem;
+}
+
+.register .contentbox p {
+  width: 100%;
+  text-indent: 0.8rem;
+  color: #999999;
+  line-height: 32px;
+  font-size: 12px;
+  letter-spacing: 0.28px;
+}
+
+.register .p-checkbox {
+  width: 100%;
+  padding: 0.02666667rem 0.4rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  display: inline-block;
+  line-height: 1;
+  position: relative;
+  vertical-align: middle;
+  margin-bottom: 0.58666667rem;
+}
+
+.register .p-checkbox .checkbox-inner {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  border: 1px solid #bfcbd9;
+  border-radius: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  top: -2px;
+  margin-bottom: 0;
+  background-color: #fff;
+  z-index: 1;
+  -webkit-transition: border-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46), background-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46);
+  transition: border-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46), background-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46);
+}
+
+.register .p-checkbox .checkbox-inner:after {
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box;
+  content: "";
+  border: 2px solid #fff;
+  border-left: 0;
+  border-top: 0;
+  height: 8px;
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  -webkit-transform: rotate(45deg) scaleY(0);
+          transform: rotate(45deg) scaleY(0);
+  width: 4px;
+  -webkit-transition: -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+  transition: -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+  transition: transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+  transition: transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s, -webkit-transform 0.15s cubic-bezier(0.71, -0.46, 0.88, 0.6) 0.05s;
+  -webkit-transform-origin: center;
+          transform-origin: center;
+}
+
+.register .p-checkbox .checkbox-input:checked + .checkbox-inner {
+  background-color: #B31C2E;
+  border-color: #B31C2E;
+}
+
+.register .p-checkbox .checkbox-input:checked + .checkbox-inner:after {
+  -webkit-transform: rotate(45deg) scaleY(1);
+          transform: rotate(45deg) scaleY(1);
+}
+
+.register .p-checkbox #latow {
+  margin-left: 0.42666667rem;
+}
+
+.register .logbtn {
+  display: block;
+  width: 100%;
+  height: 1.17333333rem;
+  background: #B31C2E;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.45333333rem;
+  color: #fff;
+  line-height: 1.17333333rem;
+}
+
+.register .content-mid {
+  width: 100%;
+  padding: 0.13333333rem 0.8rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+}
+
+.register .content-mid .radio-input {
+  margin-right: 0.42666667rem;
+  line-height: 0.05333333rem;
+  outline: none;
+  border: none;
+}
+
+.register .content-mid .radio-info {
+  font-size: 0.64rem;
+}
+
+.activity {
+  width: 100%;
+  height: 100%;
+  background: url("/img/activity.png") no-repeat center top;
+  background-size: 100% 100%;
+}
+
+.activity .top {
+  display: block;
+  width: 100%;
+  height: 55%;
+}
+
+.activity .btn {
+  width: 4.53333333rem;
+  height: 1.73333333rem;
+  background: url("/img/31.png") no-repeat center top;
+  background-size: 4.53333333rem 1.73333333rem;
+  margin: 0 auto;
+}
+
+.activity .mid {
+  display: block;
+  width: 93%;
+  height: 21%;
+  margin: 0.53333333rem auto;
+  background: url("/img/111.png") no-repeat center top;
+  background-size: 100% 100%;
+}
+
+.activity .mid span {
+  display: block;
+  width: 100%;
+  height: 34%;
+}
+
+.activity .mid .midtext {
+  border: 1px solid red;
+  width: 100%;
+  height: 66%;
+  position: relative;
+  line-height: 0.37333333rem;
+  padding: 0.05333333rem 0.10666667rem;
+}
+

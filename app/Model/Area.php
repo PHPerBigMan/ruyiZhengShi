@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Model;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Area extends Model
+{
+    //
+    protected $table = 'ruyi_area';
+
+}
