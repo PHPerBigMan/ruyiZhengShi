@@ -81,15 +81,18 @@ class RegisterController extends Controller {
                     foreach($Message as $k=>$v){
                        if($message[$k] == 4 || ($message[$k] == 5)){
                            $messageType = 2;
+                           $img = '/uploads/messageImg/welcome.jpg';
                        }else{
                            $messageType = 0;
+                           $img = "";
                        }
                         DB::table('message')->insert([
                             'user_id'=>$user_id,
                             'equipment_type'=>$userType,
                             'title'=>$v->title,
                             'content'=>$v->content,
-                            'type'=>$messageType
+                            'type'=>$messageType,
+                            'img'=>$img
                         ]);
                     }
 
@@ -109,20 +112,25 @@ class RegisterController extends Controller {
             }else{
                 if($userType == 0){
                     $table = 'user';
+                    $name = 'user_id';
                 }else if($userType == 1){
                     $table = 'business_user';
+                    $name = 'business_id';
                 }
 
 
                 $s = DB::table($table)->where(['phone'=>$registerData['phone']])->update([
                     'password'=>sha1($registerData['password'])
                 ]);
+
+                $request->session()->put($name,DB::table($table)->where('phone',$registerData['phone'])->value('id'));
                 if($s){
                     $retJson['code'] = 200;
                     $retJson['msg']  = '密码修改成功';
+                    $retJson[$name]  = DB::table($table)->where('phone',$registerData['phone'])->value('id');
                 }else{
                     $retJson['code'] = 404;
-                    $retJson['msg']  = '请检查手机号是否正确';
+                    $retJson['msg']  = '密码没有更改';
                 }
 
             }
@@ -285,4 +293,6 @@ class RegisterController extends Controller {
 
         return response()->json($retJson);
     }
+
+
 }

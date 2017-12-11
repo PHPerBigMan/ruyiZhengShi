@@ -32,22 +32,24 @@ class ProductController extends Controller {
 
     public function read(Request $request){
         $ProductId = $request->except(['s']);
-
+        $s = new Logs();
+        $s->logs('产品详情查看',$ProductId);
         $ProductData = DB::table('product as p')
             ->join('product_cat as c','c.id','=','p.cat_id')
             ->join('business_user as b','b.id','=','p.business_id')
             ->where(['p.id'=>$ProductId['product_id']])
-            ->select('p.*','c.cat_name','b.companyName')->first();
+            ->select('p.*','c.cat_name','b.companyName','c.id as cat_id')->first();
 
         $ProductData->content = json_decode($ProductData->content);
-
-        $ProductData->content->is_show = $ProductData->is_show;
-        $ProductData->content->cat_name = $ProductData->cat_name;
-        $ProductData->content->property = $ProductData->content->type;
-        $ProductData->content->companyName = $ProductData->companyName;
+//        dd($ProductData);
+        $ProductData->content->is_show = empty($ProductData->is_show) ? "" :$ProductData->is_show;
+        $ProductData->content->cat_name = empty($ProductData->cat_name) ? "" :$ProductData->cat_name;
+        $ProductData->content->property = !isset($ProductData->content->type) ? "" :$ProductData->content->type;
+        $ProductData->content->companyName = empty($ProductData->companyName) ? "" :$ProductData->companyName;
 
         $retJson = returnData($ProductData->content);
         return response()->json($retJson);
+
     }
 
     /**

@@ -97,6 +97,14 @@ class ApplyForm extends Model{
 
             }
 
+            if(isset($ApplyData['imgs'])){
+                $save = $ApplyData['imgs'];
+                foreach($save as $k=>$v){
+                    $imgs[$k] = '/uploads/'.$v->store('img','img');
+                }
+                $ApplyData['imgs'] = json_encode($imgs);
+            }
+
             //保存车辆登记图片
             if(!empty($ApplyData['cardj'])){
                 if(is_file($ApplyData['cardj']) ){
@@ -122,6 +130,10 @@ class ApplyForm extends Model{
                     $ApplyData['Shangbiao'] = '/uploads/'.Storage::disk('fcz')->put('fcz', $ApplyData['Shangbiao']);
                 }
             }
+
+            $log = new Logs();
+            $log->logs("保存合同类担保品数据",$ApplyData);
+
             $SaveData = json_encode($ApplyData);
             $s = DB::table('apply_form')->where(['user_id'=>$ApplyData['user_id'],'cat_id'=>$ApplyData['cat_id'],'equipment_type'=>$ApplyData['applicantType']])->update([
                 'data'=>$SaveData
@@ -177,110 +189,137 @@ class ApplyForm extends Model{
             $noChecked = array();
             //需求品平均分
             $needScoreAvg = 50/count($title);
+
             foreach($CheckProduct as $k=>$v){
                 foreach($new_title as $k1=>$v1){
                     try{
-                        if($v1 == 'money'){
-                            if($v['money'] == "1-10万" || $v['money'] == "10-100万"){
-                                $money = explode('-',$v['money']);
-                                $ChineseMoney = explode('万',$money[1]);
-                                $checkMoney = $ChineseMoney[0];
-                            }else if($v['money'] == "5000万以上"){
-                                $ChineseMoney = explode('万以上',$v['money']);
-                                $checkMoney = $ChineseMoney[0];
+
+                            // 如果不是如易类
+                            if($v1 == 'money'){
+                                if($v['money'] == "1-10万" || $v['money'] == "10-100万"){
+                                    $money = explode('-',$v['money']);
+                                    $ChineseMoney = explode('万',$money[1]);
+                                    $checkMoney = $ChineseMoney[0];
+                                }else if($v['money'] == "5000万以上"){
+                                    $ChineseMoney = explode('万以上',$v['money']);
+                                    $checkMoney = $ChineseMoney[0];
+                                }else{
+                                    $ChineseMoney = explode('万以内',$v['money']);
+                                    $checkMoney = $ChineseMoney[0];
+                                }
+
+                                if($ContrastData[$v1]<= $checkMoney){
+                                    if($ApplyData['cat_id'] != 37){
+                                        $CheckProduct[$k]['matching'] += $needScoreAvg;
+                                    }else{
+                                        $CheckProduct[$k]['matching'] += 20;
+                                    }
+                                }
+                            }else if($v1 == 'accrual'){
+                                //如果是利息则判断是否在区间内
+                                $accrual = explode('-',$ContrastData['accrual']);
+                                if($v[$v1] >= $accrual[0] && $v[$v1]<= $accrual[1] ){
+                                    if($ApplyData['cat_id'] != 37){
+                                        $CheckProduct[$k]['matching'] += $needScoreAvg;
+                                    }else{
+                                        $CheckProduct[$k]['matching'] += 20;
+                                    }
+                                }
+                            }else if($v1 == 'area'){
+                                //如果B端产品填写不限  则不管在哪里都加 上对应的百分比分数  如果不是不限则  相同时才加上分数
+                                if($ApplyData['cat_id'] != 37) {
+                                    if ($v['area'] == "不限 不限 不限") {
+                                        $CheckProduct[$k]['matching'] += 50 / $count;
+                                    } else {
+                                        if ($v['area'] == $ContrastData['area']) {
+
+                                            $CheckProduct[$k]['matching'] += 50 / $count;
+
+                                        }
+                                    }
+                                }
+                            }else if($v1 == 'lending_cycle'){
+                                $lending_cycle = explode('-',$ContrastData['lending_cycle']);
+                                if($v['audit_time'] <= $lending_cycle[1]){
+                                    if($ApplyData['cat_id'] != 37){
+                                        $CheckProduct[$k]['matching'] += $needScoreAvg;
+                                    }else{
+                                        $CheckProduct[$k]['matching'] += 20;
+                                    }
+                                }
+                            }else if($v1 == 'product_cycle'){
+                                //处理 product_cycle
+                                // 用户填写的数据
+                                $product_cycle = explode('个月',$ContrastData['product_cycle']);
+                                if($ContrastData['product_cycle'] == "1-3个月"){
+                                    $ContrastData['product_cycle'] = $product_cycle[1];
+                                }else if($ContrastData['product_cycle'] == "6个月"){
+                                    $ContrastData['product_cycle'] = $product_cycle[0];
+                                }else if($ContrastData['product_cycle'] == "6-12个月"){
+                                    $ContrastData['product_cycle'] = $product_cycle[1];
+                                }else{
+                                    $product_cycle = explode('个月以上',$ContrastData['product_cycle']);
+                                    $ContrastData['product_cycle'] = $product_cycle[0];
+                                }
+
+                                //产品数据
+                                $product_cycle_check = explode('个月',$v['product_cycle']);
+                                if($v['product_cycle'] == "1-3个月"){
+                                    $ContrastData['product_cycle'] = $product_cycle_check[1];
+                                }else if($v['product_cycle'] == "6个月"){
+                                    $ContrastData['product_cycle'] = $product_cycle_check[0];
+                                }else if($v['product_cycle'] == "12个月"){
+                                    $v['product_cycle'] = $product_cycle_check[1];
+                                }else{
+                                    $product_cycle_check = explode('个月以上',$v['product_cycle']);
+                                    $v['product_cycle'] = $product_cycle_check[0];
+                                }
+
+                                if($v['product_cycle'] >= $ContrastData['product_cycle']){
+                                    if($ApplyData['cat_id'] != 37){
+                                        $CheckProduct[$k]['matching'] += $needScoreAvg;
+                                    }else{
+                                        $CheckProduct[$k]['matching'] += 20;
+                                    }
+                                }
+                            }else if($v1 == 'is_mortgage'){
+                                if($ApplyData['cat_id'] != 37){
+                                    if($v['is_mortgage'] == '不限'){
+                                        $CheckProduct[$k]['matching'] += 50/$count;
+                                    }else{
+                                        if($ContrastData['mortgage'] == '无'){
+                                            $CheckProduct[$k]['matching'] += 50/$count;
+                                        }
+                                    }
+                                }
+                            }else if($v1 == 'credit'){
+                                if($ApplyData['cat_id'] != 37){
+                                    if($v['credit'] == '1年内逾期超过3次或超过90天'){
+                                        $CheckProduct[$k]['matching'] += 50/$count;
+                                    }else if($v['credit'] = "1年内逾期少于3次且少于90天"){
+                                        if($ContrastData['credit'] == '1年内逾期少于3次且少于90天'  || $ContrastData['credit'] == '信用良好无逾期'){
+                                            $CheckProduct[$k]['matching'] += 50/$count;
+                                        }
+                                    }else{
+                                        if($ContrastData['credit'] == '信用良好无逾期'){
+                                            $CheckProduct[$k]['matching'] += 50/$count;
+                                        }
+                                    }
+                                }
                             }else{
-                                $ChineseMoney = explode('万以内',$v['money']);
-                                $checkMoney = $ChineseMoney[0];
-                            }
-//                            dd($checkMoney);
-                            if($ContrastData[$v1]<= $checkMoney){
-                                $CheckProduct[$k]['matching'] += $needScoreAvg;
-                            }
-                        }else if($v1 == 'accrual'){
-                            //如果是利息则判断是否在区间内
-                            $accrual = explode('-',$ContrastData['accrual']);
-                            if($v[$v1] >= $accrual[0] && $v[$v1]<= $accrual[1] ){
-                                $CheckProduct[$k]['matching'] += $needScoreAvg;
-                            }
-                        }else if($v1 == 'area'){
-                            //如果B端产品填写不限  则不管在哪里都加 上对应的百分比分数  如果不是不限则  相同时才加上分数
-                            if($v['area'] == "不限 不限 不限"){
-                                $CheckProduct[$k]['matching'] += 50/$count;
-                            }else{
-                                if($v['area'] == $ContrastData['area']){
+                                if(($v[$v1] == $ContrastData[$v1]) && in_array($v1,$title) && ($v1 != 'money') && (($v1 != 'accrual'))){
+                                    // 如果是在需求品字段数组内 且不是 money 匹配成功则 每一项匹配成功 +10
+                                    $CheckProduct[$k]['matching'] += $needScoreAvg;
+                                }else if(($v[$v1] == $ContrastData[$v1] && (!in_array($v1,$title)) && (in_array($v1,$new_title)))){
+                                    // 如果在担保品字段数组内 剩余的50分 按照担保字段的数量进行平均分配 匹配成功则 +平均分
                                     $CheckProduct[$k]['matching'] += 50/$count;
+                                }else{
+                                    if(!in_array($v1,$noChecked)){
+                                        //保存未匹配项字段名称
+                                        array_push($noChecked,$v1);
+                                    }
                                 }
                             }
-                        }else if($v1 == 'lending_cycle'){
-                            $lending_cycle = explode('-',$ContrastData['lending_cycle']);
-                            if($v['audit_time'] <= $lending_cycle[1]){
-                                $CheckProduct[$k]['matching'] += $needScoreAvg;
-                            }
-                        }else if($v1 == 'product_cycle'){
-                            //处理 product_cycle
-                            // 用户填写的数据
-                            $product_cycle = explode('个月',$ContrastData['product_cycle']);
-                            if($ContrastData['product_cycle'] == "1-3个月"){
-                                $ContrastData['product_cycle'] = $product_cycle[1];
-                            }else if($ContrastData['product_cycle'] == "6个月"){
-                                $ContrastData['product_cycle'] = $product_cycle[0];
-                            }else if($ContrastData['product_cycle'] == "6-12个月"){
-                                $ContrastData['product_cycle'] = $product_cycle[1];
-                            }else{
-                                $product_cycle = explode('个月以上',$ContrastData['product_cycle']);
-                                $ContrastData['product_cycle'] = $product_cycle[0];
-                            }
-
-                            //产品数据
-                            $product_cycle_check = explode('个月',$v['product_cycle']);
-                            if($v['product_cycle'] == "1-3个月"){
-                                $ContrastData['product_cycle'] = $product_cycle_check[1];
-                            }else if($v['product_cycle'] == "6个月"){
-                                $ContrastData['product_cycle'] = $product_cycle_check[0];
-                            }else if($v['product_cycle'] == "12个月"){
-                                $v['product_cycle'] = $product_cycle_check[1];
-                            }else{
-                                $product_cycle_check = explode('个月以上',$v['product_cycle']);
-                                $v['product_cycle'] = $product_cycle_check[0];
-                            }
-
-                            if($v['product_cycle'] >= $ContrastData['product_cycle']){
-                                $CheckProduct[$k]['matching'] += $needScoreAvg;
-                            }
-                        }else if($v1 == 'is_mortgage'){
-                            if($v['is_mortgage'] == '不限'){
-                                $CheckProduct[$k]['matching'] += 50/$count;
-                            }else{
-                               if($ContrastData['mortgage'] == '无'){
-                                   $CheckProduct[$k]['matching'] += 50/$count;
-                               }
-                            }
-                        }else if($v1 == 'credit'){
-                           if($v['credit'] == '1年内逾期超过3次或超过90天'){
-                               $CheckProduct[$k]['matching'] += 50/$count;
-                           }else if($v['credit'] = "1年内逾期少于3次且少于90天"){
-                               if($ContrastData['credit'] == '1年内逾期少于3次且少于90天'  || $ContrastData['credit'] == '信用良好无逾期'){
-                                   $CheckProduct[$k]['matching'] += 50/$count;
-                               }
-                           }else{
-                               if($ContrastData['credit'] == '信用良好无逾期'){
-                                   $CheckProduct[$k]['matching'] += 50/$count;
-                               }
-                           }
-                        }else{
-                            if(($v[$v1] == $ContrastData[$v1]) && in_array($v1,$title) && ($v1 != 'money') && (($v1 != 'accrual'))){
-                                // 如果是在需求品字段数组内 且不是 money 匹配成功则 每一项匹配成功 +10
-                                $CheckProduct[$k]['matching'] += $needScoreAvg;
-                            }else if(($v[$v1] == $ContrastData[$v1] && (!in_array($v1,$title)) && (in_array($v1,$new_title)))){
-                                // 如果在担保品字段数组内 剩余的50分 按照担保字段的数量进行平均分配 匹配成功则 +平均分
-                                $CheckProduct[$k]['matching'] += 50/$count;
-                            }else{
-                                if(!in_array($v1,$noChecked)){
-                                    //保存未匹配项字段名称
-                                    array_push($noChecked,$v1);
-                                }
-                            }
-                        }
                     }catch (\Exception $e){
                         $Log = new Logs();
                         $Log->logs('产品缺少参数',$v1);

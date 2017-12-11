@@ -21,6 +21,12 @@ Route::group(['namespace'=>'Page'],function(){
     Route::get('/dowonloadpage','PageController@dowonloadpage');
     Route::get('/clientpage','PageController@clientpage');
     Route::get('/getError','DemoController@getErro');
+    Route::get('/activity',function (){
+        return view('/pages/activity');
+    });
+    Route::get('/clientactivity',function (){
+        return view('/pages/clientactivity');
+    });
 });
 
 Route::get('/success', function () {
@@ -185,7 +191,7 @@ Route::group(['prefix'=>'api','namespace'=>'Api','middleware'=>['VerifyCsrfToken
     Route::any('/saveData','BusinessSettledController@SaveData');
     Route::any('/changePhone','BusinessSettledController@SaveCompanyPhone');
     Route::any('/userData','BusinessSettledController@UserData');
-    Route::any('/demo','ProductController@demo');
+    Route::any('/demo','RegisterController@demo');
     Route::any('/messageList','MessageController@MessageList');
     Route::any('/moreMessage','MessageController@MoreMessageList');
     Route::any('/messageRead','MessageController@MessageRead');
@@ -198,6 +204,7 @@ Route::group(['prefix'=>'api','namespace'=>'Api','middleware'=>['VerifyCsrfToken
 
 Route::group(['prefix'=>'pay','namespace'=>'Api','middleware'=>'VerifyCsrfToken'],function(){
     Route::any('/callback','PayController@getInfo');
+    Route::any('/setSign','PayController@setSign');
 });
 
 Route::group(['prefix'=>'bapi','namespace'=>'Bapi','middleware'=>'VerifyCsrfToken'],function(){

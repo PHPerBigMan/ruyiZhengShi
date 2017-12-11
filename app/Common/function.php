@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 
 function returnData($data){
     if(empty($data)){
+        $data = "";
         $retJson['code'] = 400;
         $retJson['msg'] = "";
     }else{
@@ -35,6 +36,34 @@ function returnData($data){
 
     return $j;
 }
+
+
+/**
+ * @param $data
+ * @return array
+ * author hongwenyang
+ * method description : 返回消息数据
+ */
+
+function returnDataMessage($data,$count){
+    if(empty($data)){
+        $retJson['code'] = 400;
+        $retJson['msg'] = "";
+    }else{
+        $retJson['code'] = 200;
+        $retJson['msg'] = "获取数据成功";
+    }
+
+    $j = [
+        'data'=>$data,
+        'count'=>$count,
+        'code'=>$retJson['code'],
+        'msg'=>$retJson['msg'],
+    ];
+
+    return $j;
+}
+
 
 /**
  * @param $data
@@ -189,19 +218,13 @@ function ProductCheck($data,$type){
     $count = count($new_title)-5;
     $noChecked = array();
     //需求品平均分
-    $needScoreAvg = 50/count($title);;
+    $linshiProductId = [45,46,47,48,49,50];
+
+    $needScoreAvg = 50/count($title);
     foreach($CheckProduct as $k=>$v){
         foreach($new_title as $k1=>$v1){
             try{
                 if($v1 == 'money'){
-                    //如果是金额则判断是否在区间内
-//                    $money = explode('-',$v['money']);
-//                    $ChineseMoney = explode('万',$money[1]);
-//                    if(!$ChineseMoney){
-//                        $ChineseMoney = explode('万以上',$money[1]);
-//                    }
-//                    $money[1] = $ChineseMoney[0];
-
                     if($v['money'] == "1-10万" || $v['money'] == "10-100万"){
                         $money = explode('-',$v['money']);
                         $ChineseMoney = explode('万',$money[1]);
@@ -213,11 +236,16 @@ function ProductCheck($data,$type){
                         $ChineseMoney = explode('万以内',$v['money']);
                         $checkMoney = $ChineseMoney[0];
                     }
-                    if($ContrastData[$v1]<= $checkMoney){
-                        $CheckProduct[$k]['matching'] += $needScoreAvg;
+                    if(isset($ContrastData[$v1])){
+                        if($ContrastData[$v1]<= $checkMoney){
+                            $CheckProduct[$k]['matching'] += $needScoreAvg;
+                        }else{
+                            array_push($noChecked,$v1);
+                        }
                     }else{
-                        array_push($noChecked,$v1);
+                        $CheckProduct[$k]['matching'] += $needScoreAvg;
                     }
+
                 }else if($v1 == 'accrual'){
                     //如果是利息则判断是否在区间内
                     $accrual = explode('-',$ContrastData['accrual']);
@@ -321,7 +349,7 @@ function ProductCheck($data,$type){
                 }
             }catch (\Exception $e){
                 $Log = new Logs();
-                $Log->logs('产品缺少参数',$v1);
+                $Log->logs('产品缺少参数',88);
             }
 
         }
@@ -558,6 +586,7 @@ function ProductSort($CheckProduct,$SortKey){
             break;
     }
     sort($CheckProduct);
+
     for($i = 1;$i<count($CheckProduct);$i++){
         for ($j = count($CheckProduct)-1;$j>=$i  ;$j-- ){
             if($SortKey == '0' || $SortKey == '2' || $SortKey == '4'){

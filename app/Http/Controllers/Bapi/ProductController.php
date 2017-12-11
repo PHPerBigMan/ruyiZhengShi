@@ -24,11 +24,11 @@ class ProductController extends Controller
 //        dd($ProductData);
         foreach($ProductData as $k=>$v){
             $content                        = json_decode($v->content,true);
-            $ProductData[$k]->money         = $content['money'];
-            $ProductData[$k]->accrual       = $content['accrual'];
-            $ProductData[$k]->lending_cycle = $content['product_cycle'];
-            $ProductData[$k]->is_home       = $content['is_home'];
-            $ProductData[$k]->lending_type  = $content['lending_type'];
+            $ProductData[$k]->money         = empty($content['money']) ? "" :$content['money'] ;
+            $ProductData[$k]->accrual       = empty($content['accrual']) ? "" : $content['accrual'];
+            $ProductData[$k]->lending_cycle = empty($content['product_cycle']) ? "" : $content['product_cycle'];
+            $ProductData[$k]->is_home       = empty($content['is_home']) ? "" : $content['is_home'];
+            $ProductData[$k]->lending_type  = empty($content['lending_type']) ? "" : $content['lending_type'];
             $ProductData[$k]->pNumber  = $content['pNumber'];
             unset($ProductData[$k]->content);
         }
@@ -70,14 +70,15 @@ class ProductController extends Controller
         unset($ProductData['business_id']);
         unset($ProductData['cat_id']);
 
-        $ProductData['district'] = $ProductData['area'];
+        $ProductData['district'] = isset($ProductData['area']) ? $ProductData['area'] : "";
 
         //处理产品范围数据
         $save['province'] = "不限";
         $save['city'] = "不限";
         $save['district'] = "不限";
         // 添加产品类型
-        $ProductData['type'] = DB::table('product_cat')->where('id',$cat_id)->value('cat_name');
+//        $ProductData['type'] = DB::table('product_cat')->where('id',$cat_id)->value('cat_name');
+
         if(isset($ProductData['area']) && $ProductData['area'] != "null" && $ProductData['area']!= "不限"){
                 $dizhi = explode(' ',$ProductData['area']);
                 $save['province'] = $dizhi[0];
@@ -85,6 +86,7 @@ class ProductController extends Controller
                 $save['district'] = $dizhi[2];
 
         }
+
         if(empty($ProductData['id'])){
             $s = DB::table('product')->insert([
                 'business_id'=>$business_id,
@@ -95,6 +97,7 @@ class ProductController extends Controller
                 'district'   =>$save['district'],
             ]);
         }else{
+
             $s = DB::table('product')->where(['id'=>$ProductData['id']])->update([
                 'business_id'=>$business_id,
                 'cat_id'     =>$cat_id,
@@ -103,6 +106,7 @@ class ProductController extends Controller
                 'city'       =>$save['city'],
                 'district'   =>$save['district'],
             ]);
+
         }
         $retStatus = returnStatus($s);
         return response()->json($retStatus);

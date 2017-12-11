@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Model\Logs;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mockery\Exception;
 
 class MessageController extends Controller
@@ -35,8 +37,17 @@ class MessageController extends Controller
             $retData[0]['is_read']     = !empty(DB::table('message')->where([
                 'user_id'=>$UserId['user_id'],
                 'type'=>$FirData->type,
-                'is_read'=>0
+                'is_read'=>0,
+                'equipment_type'=>$UserId['equipment_type']
             ])->first()) ? 0 : 1;
+            $count1     = DB::table('message')->where([
+                'user_id'=>$UserId['user_id'],
+                'type'=>$FirData->type,
+                'is_read'=>0,
+                'equipment_type'=>$UserId['equipment_type']
+            ])->count();
+        }else{
+            $count1 = 0;
         }
         if(!empty($SecData)){
             $retData[1]['title']       = $SecData->title;
@@ -47,8 +58,17 @@ class MessageController extends Controller
             $retData[1]['is_read']     = !empty(DB::table('message')->where([
                 'user_id'=>$UserId['user_id'],
                 'type'=>$SecData->type,
-                'is_read'=>0
+                'is_read'=>0,
+                'equipment_type'=>$UserId['equipment_type']
             ])->first()) ? 0 : 1;
+            $count2    = DB::table('message')->where([
+                'user_id'=>$UserId['user_id'],
+                'type'=>$SecData->type,
+                'is_read'=>0,
+                'equipment_type'=>$UserId['equipment_type']
+            ])->count();
+        }else{
+            $count2 = 0;
         }
         if(!empty($ThiData)){
             $retData[2]['title']       = $ThiData->title;
@@ -59,13 +79,25 @@ class MessageController extends Controller
             $retData[2]['is_read']     = !empty(DB::table('message')->where([
                 'user_id'=>$UserId['user_id'],
                 'type'=>$ThiData->type,
-                'is_read'=>0
+                'is_read'=>0,
+                'equipment_type'=>$UserId['equipment_type']
             ])->first()) ? 0 : 1;
+            $count3     = DB::table('message')->where([
+                'user_id'=>$UserId['user_id'],
+                'type'=>$ThiData->type,
+                'is_read'=>0,
+                'equipment_type'=>$UserId['equipment_type']
+            ])->count();
+        }else{
+            $count3 = 0;
         }
+
         sort($retData);
-        $retData = returnData($retData);
+        $count = $count1 +  $count2 + $count3;
+        $retData = returnDataMessage($retData,$count);
         return response()->json($retData);
     }
+
 
     /**
      * @param Request $request
@@ -97,6 +129,8 @@ class MessageController extends Controller
 
     public function MessageRead(Request $request){
         $MessageId = $request->except(['s']);
+        $ss = new Logs();
+        $ss->logs('查看消息',$MessageId);
         $MessageData = DB::table('message')->where($MessageId)->select('title','create_time','content','img')->first();
         //修改状态为已读
         DB::table('message')->where($MessageId)->update([

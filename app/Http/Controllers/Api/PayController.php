@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Model\LianLian;
 use App\Model\Logs;
+use App\Model\UserApply;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -45,6 +46,27 @@ class PayController extends Controller
         $para = $this->buildRequestPara($getdata);*/
     }
 
+    public function setSign(Request $request){
+        $all=  $request->except(['s']);
+        $para = $this->buildRequestPara($all);
+        $s = new Logs();
+        $s->logs('生成Ios的Sign',$para);
+        if(empty($para['sign'])){
+           $code = 404;
+           $msg  = "生成签名错误";
+           $data = "";
+        }else{
+            $code = 200;
+            $msg = "生成成功";
+            $data = $para['sign'];
+        }
+        $j = [
+            'code'=>$code,
+            'msg'=>$msg,
+            'sign'=>$data
+        ];
+        return response($j);
+    }
     /**
      * @param Request $request
      * @return Request|mixed
@@ -71,6 +93,21 @@ class PayController extends Controller
     public function getInfo(Request $request){
         $s = new Logs();
         $s->logs('连连支付异步回调',$request->all());
+       $notify_data = $request->all();
+       if($notify_data['result_pay'] == "SUCCESS"){
+           // 支付成功
+           if($notify_data['info_order'] == 2){
+               // B端支付 修改支付状态
+               UserApply::where('order_id',$notify_data['no_order'])->update([
+                   'b_apply_status'=>4
+               ]);
+           }else{
+               // C端支付 修改支付状态
+               UserApply::where('order_id',$notify_data['no_order'])->update([
+                   'c_apply_status'=>4
+               ]);
+           }
+       }
     }
 
 

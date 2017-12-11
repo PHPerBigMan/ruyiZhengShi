@@ -107,10 +107,12 @@ class PageController extends Controller
         if($registerData['code'] == session('code')){
             if($userType == 0){
                 $table = 'user';
+                $message = [4,10];
             }else if($userType == 1){
                 $table = 'business_user';
                 $num = str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
                 $registerData['number'] = $num;
+                $message = [5,11];
             }
 
             $isRegistered = DB::table($table)->where(['phone'=>$registerData['phone']])->first();
@@ -138,6 +140,37 @@ class PageController extends Controller
                 ])->update([
                     'qrcode'=>'/qrcodes/'.$imgName
                 ]);
+
+                //获取注册成功模板消息
+                $Message = DB::table('article')->whereIn('type',$message)->get();
+                //注册成功发送消息
+                foreach($Message as $k=>$v){
+                    if($message[$k] == 4 || ($message[$k] == 5)){
+                        $messageType = 2;
+                        $img = '/uploads/messageImg/welcome.jpg';
+                    }else{
+                        $messageType = 0;
+                        $img = "";
+                    }
+                    DB::table('message')->insert([
+                        'user_id'=>$user_id,
+                        'equipment_type'=>$userType,
+                        'title'=>$v->title,
+                        'content'=>$v->content,
+                        'type'=>$messageType,
+                        'img'=>$img
+                    ]);
+                }
+
+                // 增加金币变化数据
+                DB::table('integral_list')->insert([
+                    'user_id'=>$user_id,
+                    'integral'=>100,
+                    'integraling'=>100,
+                    'type'=>0,
+                    'user_type'=>$userType
+                ]);
+
                 $retJson['code'] = 200;
                 $retJson['msg']  = '注册成功';
                 $retJson[$name]  = $user_id;
@@ -153,11 +186,16 @@ class PageController extends Controller
 
 
     public function dowonloadpage(){
+
         return view('pages.dowonloadpage');
     }
 
     public function clientpage(){
-        return view('pages.clientpage');
+        $datac = DB::table('config')->where([
+            'key'=>'apkc'
+        ])->value('value');
+
+        return view('pages.clientpage',compact('datac'));
     }
 }
 

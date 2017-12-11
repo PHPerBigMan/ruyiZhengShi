@@ -25,6 +25,7 @@ class ApplyBasic extends Model{
      */
 
     public function applyBasic($data){
+
         $title = ['name','sex','idCard','address','phone','merry','job','income','sf','jh'];
         if(empty($data['sf'])){
             $data['sf'] = [];
@@ -108,23 +109,24 @@ class ApplyBasic extends Model{
      */
 
     public function applCompanyBasic($data){
-
-        $title = ['companyName','companyFa','companyAddress','companyType','companyZhu','companyYin','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt'];
+        $log = new Logs();
+        $log->logs('保存企业用户基本信息',$data);
+        $title = ['companyName','companyFa','companyAddress','companyType','companyZhu','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt'];
         if($data['applicantType'] == 1){
             $data['user_id'] = $data['business_id'];
-            $title = ['companyName','companyFa','companyAddress','companyType','companyZhu','companyYin','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt','share'];
+            $title = ['companyName','companyFa','companyAddress','companyType','companyZhu','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt','share'];
         }
 
         foreach($title as $k=>$v){
             //基本资料
             $Basic[$v] = $data[$v];
-            if(!empty($data['companyYin'])){
+            if(isset($data['companyYin'])){
                 if(is_file($data['companyYin']) ){
                     $Basic['companyYin'] = '/uploads/'.Storage::disk('fcz')->put('fcz', $data['companyYin']);
                 }
             }
 
-            if(!empty($data['companyXu'])){
+            if(isset($data['companyXu'])){
                 if(is_file($data['companyXu']) ){
                     $Basic['companyXu'] = '/uploads/'.Storage::disk('fcz')->put('fcz', $data['companyXu']);
                 }

@@ -130,10 +130,17 @@ class IndexController extends Controller {
         $type = $request->input('type');
         if($type){
             //B端
-            $img = URL.'uploads/icon/app_icon(1).png';
+            $img = URL.'/activity';
         }else{
-            $img = URL.'uploads/icon/app_icon.png';
+            $img = URL.'/clientactivity';
         }
-        return returnData($img);
+
+        $j = [
+            'url'=>$img,
+            'title'=>"【如易金服】现金大派送 100%,就怕你不用",
+            'desc'=>"如易金服推广链接"
+        ];
+
+        return returnData($j);
     }
 }

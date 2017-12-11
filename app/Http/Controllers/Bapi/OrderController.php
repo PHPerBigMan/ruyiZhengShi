@@ -36,40 +36,46 @@ class OrderController extends Controller
         $OrderType['b_apply_status'] = [$OrderType['type']];
        if($OrderType['type'] == 4){
            $c_apply_status = [4,7,8];
-           $OrderType['b_apply_status'] = [3,4];
+           $OrderType['b_apply_status'] = [3];
        }else if($OrderType['type'] == 2){
            $c_apply_status = [4,7];
+           $OrderType['b_apply_status'] = [2,3];
        }else if($OrderType['type'] == 5){
            $OrderType['b_apply_status'] = [5,8];
        }
 
        if(empty($OrderType['day'])){
-           $OrderType['day'] = date('Y-m-d');
+
+           $OrderData = DB::table('user_apply as u')
+               ->join('product as p','p.id','=','u.product_id')
+               ->join('product_cat as c','c.id','=','p.cat_id')
+//               ->join('user as us','us.id','=','u.user_id')
+               ->where(['p.business_id'=>$OrderType['business_id']])
+               ->whereIn('u.c_apply_status',$c_apply_status)
+               ->whereIn('u.b_apply_status',$OrderType['b_apply_status'])
+               ->select('u.order_id','c.cat_name','p.content as pData','p.cat_id','c.cat_name','u.user_id','u.order_type','c.p_id','u.create_time','u.order_type','u.b_apply_status')
+               ->orderBy('u.create_time','desc')
+               ->get();
        }else{
            //处理时间
            $OrderType['day'] = str_replace('年','-',$OrderType['day']);
            $OrderType['day'] = str_replace('月','-',$OrderType['day']);
            $OrderType['day'] = mb_substr($OrderType['day'],0,10);
-
+            //某一天的0点
+           $timestamp0 = strtotime($OrderType['day']);
+           //某一天的24点
+           $timestamp24 = strtotime($OrderType['day']) + 86400;
+           $OrderData = DB::table('user_apply as u')
+               ->join('product as p','p.id','=','u.product_id')
+               ->join('product_cat as c','c.id','=','p.cat_id')
+               ->where(['p.business_id'=>$OrderType['business_id']])
+               ->whereIn('u.c_apply_status',$c_apply_status)
+               ->whereIn('u.b_apply_status',$OrderType['b_apply_status'])
+               ->whereBetween('u.create_time',[$timestamp0,$timestamp24])
+               ->select('u.order_id','c.cat_name','p.content as pData','p.cat_id','c.cat_name','u.user_id','u.order_type','c.p_id','u.create_time','u.order_type','u.b_apply_status')
+               ->orderBy('u.create_time','desc')
+               ->get();
        }
-
-       //某一天的0点
-        $timestamp0 = strtotime($OrderType['day']);
-       //某一天的24点
-        $timestamp24 = strtotime($OrderType['day']) + 86400;
-
-
-       $OrderData = DB::table('user_apply as u')
-                    ->join('product as p','p.id','=','u.product_id')
-                    ->join('product_cat as c','c.id','=','p.cat_id')
-                    ->join('user as us','us.id','=','u.user_id')
-                    ->where(['p.business_id'=>$OrderType['business_id']])
-                    ->whereIn('u.c_apply_status',$c_apply_status)
-                    ->whereIn('u.b_apply_status',$OrderType['b_apply_status'])
-                    ->whereBetween('u.create_time',[$timestamp0,$timestamp24])
-                    ->select('us.user_idcard','u.order_id','c.cat_name','p.content as pData','p.cat_id','c.cat_name','u.user_id','u.order_type','c.p_id','u.create_time')
-                    ->orderBy('u.create_time','desc')
-                    ->get();
 
        foreach($OrderData as $k=>$v){
            $UserApply = json_decode(DB::table('apply_form')->where([
@@ -79,6 +85,12 @@ class OrderController extends Controller
            ])->value('need_data'),true);
            $OrderData[$k]->lending_cycle = $UserApply['lending_cycle'];
            $OrderData[$k]->accrual = $UserApply['accrual'];
+           if($v->order_type){
+               // 共享订单
+               $OrderData[$k]->user_idcard = BusinessUser::where('id',$v->user_id)->value('idcard');
+           }else{
+               $OrderData[$k]->user_idcard = User::where('id',$v->user_id)->value('user_idcard');
+           }
        }
 
 //        dd($OrderData);
@@ -99,22 +111,8 @@ class OrderController extends Controller
 
     public function Accepted(Request $request){
         $OrderType = $request->except(['s']);
-        $s = new Logs();
-        $s->logs('B-已完结',$OrderType);
-        if(empty($OrderType['day'])){
-            $OrderType['day'] = date('Ymd');
-        }else{
-            //处理时间
-            $OrderType['day'] = str_replace('年','-',$OrderType['day']);
-            $OrderType['day'] = str_replace('月','-',$OrderType['day']);
-            $OrderType['day'] = mb_substr($OrderType['day'],0,10);
 
-        }
 
-        //某一天的0点
-        $timestamp0 = strtotime($OrderType['day']);
-        //某一天的24点
-        $timestamp24 = strtotime($OrderType['day']) + 86400;
         $SecId= DB::table('product_cat')->where(['p_id'=>$OrderType['cat_id']])->select('id')->get();
         $Search = [];
         if(!$SecId->isEmpty()){
@@ -123,16 +121,36 @@ class OrderController extends Controller
                 $Search[$k] = $v->id;
             }
         }
+        if(empty($OrderType['day'])){
+            $OrderData = DB::table('user_apply as u')
+                ->join('product as p','p.id','=','u.product_id')
+                ->join('product_cat as c','c.id','=','p.cat_id')
+                ->where(['u.b_apply_status'=>$OrderType['type'],'u.c_apply_status'=>8,'p.business_id'=>$OrderType['business_id']])
+                ->whereIn('p.cat_id',$Search)
+                ->select('u.order_type','u.c_is_evaluate','u.b_is_evaluate','u.order_id','c.cat_name','p.content as pData','p.cat_id','c.cat_name','u.user_id','u.order_type','c.p_id','u.create_time','u.b_apply_status')
+                ->orderBy('u.create_time','desc')
+                ->get();
+        }else{
+            //处理时间
+            $OrderType['day'] = str_replace('年','-',$OrderType['day']);
+            $OrderType['day'] = str_replace('月','-',$OrderType['day']);
+            $OrderType['day'] = mb_substr($OrderType['day'],0,10);
+            //某一天的0点
+            $timestamp0 = strtotime($OrderType['day']);
+            //某一天的24点
+            $timestamp24 = strtotime($OrderType['day']) + 86400;
+            $OrderData = DB::table('user_apply as u')
+                ->join('product as p','p.id','=','u.product_id')
+                ->join('product_cat as c','c.id','=','p.cat_id')
+                ->where(['u.b_apply_status'=>$OrderType['type'],'u.c_apply_status'=>8,'p.business_id'=>$OrderType['business_id']])
+                ->whereIn('p.cat_id',$Search)
+                ->whereBetween('u.create_time',[$timestamp0,$timestamp24])
+                ->select('u.order_type','u.c_is_evaluate','u.b_is_evaluate','u.order_id','c.cat_name','p.content as pData','p.cat_id','c.cat_name','u.user_id','u.order_type','c.p_id','u.create_time','u.b_apply_status')
+                ->orderBy('u.create_time','desc')
+                ->get();
+        }
 
-        $OrderData = DB::table('user_apply as u')
-            ->join('product as p','p.id','=','u.product_id')
-            ->join('product_cat as c','c.id','=','p.cat_id')
-            ->where(['u.b_apply_status'=>$OrderType['type'],'u.c_apply_status'=>8,'p.business_id'=>$OrderType['business_id']])
-            ->whereIn('p.cat_id',$Search)
-            ->whereBetween('u.create_time',[$timestamp0,$timestamp24])
-            ->select('u.order_type','u.c_is_evaluate','u.b_is_evaluate','u.order_id','c.cat_name','p.content as pData','p.cat_id','c.cat_name','u.user_id','u.order_type','c.p_id','u.create_time')
-            ->orderBy('u.create_time','desc')
-            ->get();
+
 
 
         foreach($OrderData as $k=>$v){

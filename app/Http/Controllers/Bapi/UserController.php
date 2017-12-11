@@ -7,6 +7,7 @@ use App\Model\Logs;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mockery\Exception;
 
 class UserController extends Controller
@@ -27,7 +28,12 @@ class UserController extends Controller
         $userData = $request->except('s');
         $data = DB::table('business_user')->where(['id'=>$userData['business_id']])
             ->first();
-        $data->imgs = json_decode($data->imgs,true);
+//        dd($data);
+        if(empty($data->imgs)){
+            $data->imgs = [];
+        }else{
+            $data->imgs = json_decode($data->imgs,true);
+        }
         $j = returnData($data);
         return response()->json($j);
     }
@@ -80,29 +86,23 @@ class UserController extends Controller
 
             unset($SaveData['picA']);
         }
-
         //在企业有金融资质的情况下
-        if($SaveData['qualification'] == "有"){
-            try{
-                $save = $request->file('imgs');
-                foreach($save as $k=>$v){
-                    $imgs[$k] = '/uploads/'.$v->store('img','img');
-                }
-                $SaveData['imgs'] = json_encode($imgs);
-            }catch (\Exception $e){
-                return response()->json([
-                    'code'=>400,
-                    'msg'=>'缺少imgs 参数'
-                ]);
+        if(isset($SaveData['imgs'])){
+            $save = $request->file('imgs');
+            foreach($save as $k=>$v){
+                $imgs[$k] = '/uploads/'.$v->store('img','img');
             }
+            $SaveData['imgs'] = json_encode($imgs);
         }
-
 
         if(empty(DB::table('business_user')->where($map)->value('number'))){
-            $SaveData['number'] = 'R'.$SaveData['business_id'];
+            $SaveData['number'] = 'R'.$map['id'];
         }
-        //修改状态为审核中
-        $SaveData['is_pass'] = 2;
+        // 如果用户是第一次修改   状态改为审核中
+        if(empty(BusinessUser::where($map)->value('companyName'))){
+            $SaveData['is_pass'] = 2;
+        }
+
         $s = DB::table('business_user')->where($map)->update($SaveData);
 
         if($s){
@@ -199,25 +199,43 @@ class UserController extends Controller
      */
     public function Protect(Request $request){
         $pData = $request->except(['s']);
+//        dd(1);
         $UserIntegral = DB::table('business_user')->where([
             'id'=>$pData['business_id']
         ])->value('integral');
-        if($UserIntegral< $pData['num']){
+        $needintegral  = DB::table('integral_change')->value('need') * $pData['num'];
+        if($UserIntegral< $needintegral){
             $retJson['msg']  = "剩余金币不足";
             $retJson['code'] = 403;
         }else{
+            // 获取排名保护所需积分
+
             $s = DB::table('integral_list')->insert([
                 'user_id'       =>$pData['business_id'],
-                'integral'      =>$pData['num'],
-                'integraling'   =>$UserIntegral - $pData['num'],
+                'integral'      =>$needintegral,
+                'integraling'   =>$UserIntegral - $needintegral,
                 'type'          =>6,
                 'user_type'     =>1
             ]);
             if($s){
                 //减少对应的积分
-                DB::table('business_user')->where([
-                    'id'=>$pData['business_id']
-                ])->decrement('integral',$pData['num']);
+                BusinessUser::where([
+                    'id'                =>$pData['business_id'],
+                ])->decrement('integral',$needintegral);
+
+                // 如果没有进行排名保护的购买
+                $isBuy = BusinessUser::where('id',$pData['business_id'])->value('is_buy');
+                if(!$isBuy){
+                    // 之前没有进行排名保护的购买  或者排名保护已经失效
+                    BusinessUser::where('id',$pData['business_id'])->update([
+                        'is_buy'            =>1,
+                        'start_time'        =>time(),
+                        'stop_time'         =>time() + $pData['num'] * (60*60*24)
+                    ]);
+                }else {
+                    // 排名保护没有失效 进行时间的更换
+                    BusinessUser::where('id',$pData['business_id'])->increment('stop_time',$pData['num'] * (60*60*24));
+                }
                 $retJson['msg']  = "购买成功";
                 $retJson['code'] = 200;
             }else{
@@ -262,3 +280,4 @@ class UserController extends Controller
         return response()->json($retData);
     }
 }
+

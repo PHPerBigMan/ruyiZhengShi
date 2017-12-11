@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Model\BusinessUser;
 use App\Model\Config;
 use App\Model\Logs;
 use Illuminate\Http\Request;
@@ -319,6 +320,7 @@ class UserController extends Controller {
         $table = 'user';
         $Inlist = [];
         $ruyi = "";
+        $syDay = 0;
         if($userId['equipment_type'] == 1){
             $userId['user_id'] = $userId['business_id'];
             $table = 'business_user';
@@ -329,9 +331,23 @@ class UserController extends Controller {
                 'user_id'=>$userId['user_id'],
                 'user_type'=>$userId['equipment_type'],
                 'type'  => 6
-            ])->select('integral','type','create_time')->get();
+            ])->select('integral','type','create_time')->orderBy('create_time','desc')->get();
 
-            $userId['user_id'] = $userId['business_id'];
+//            $userId['user_id'] = $userId['business_id'];
+
+            // 查询用户是否购买金币排名保护
+
+            $isBuy = DB::table('business_user')->where('id',$userId['user_id'])->select('is_buy','start_time','stop_time')->first();
+
+
+            if(isset($isBuy->is_buy) && ($isBuy->is_buy == 1)){
+                //购买了 排名保护 进行 剩余天数的计算
+                if($isBuy->stop_time > time()){
+                    $syDay = ceil(($isBuy->stop_time - time()) / 60 /60/ 24);
+                }else{
+                    $syDay = 0;
+                }
+            }
         }
 
         //积分总数
@@ -341,7 +357,8 @@ class UserController extends Controller {
         $list = DB::table('integral_list')->where([
             'user_id'=>$userId['user_id'],
             'user_type'=>$userId['equipment_type']
-        ])->where('type','<','6')->select('integral','type','create_time')->get();
+        ])->where('type','<','6')->select('integral','type','create_time')->orderBy('create_time','desc')->get();
+//        dd($list);
         if(!($list->isEmpty())){
             foreach ($list as $v){
                 switch ($v->type){
@@ -382,7 +399,8 @@ class UserController extends Controller {
             'count' =>$count,
             'list'  =>$list,
             'inList'=>$Inlist,
-            'ruyi'  =>$ruyi
+            'ruyi'  =>$ruyi,
+            'syDay' =>$syDay
         ];
 
         $retData = returnData($data);

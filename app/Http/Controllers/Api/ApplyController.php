@@ -11,11 +11,15 @@ use App\Http\Controllers\Controller;
 use App\Model\Apply;
 use App\Model\ApplyBasic;
 use App\Model\ApplyForm;
+use App\Model\BusinessUser;
 use App\Model\DemandProperty;
+use App\Model\IntegralList;
 use App\Model\LianLian;
 use App\Model\Logs;
 use App\Model\OrderApplyForm;
 use App\Model\Product;
+use App\Model\User;
+use App\Model\UserApply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -53,8 +57,8 @@ class ApplyController extends Controller {
                 $retJson =  $this->model->applyBasic($ApplyData);
             }
         }else if($ApplyData['request'] == 2){
-           if(empty($ApplyData['money'])){
 
+           if(empty($ApplyData['lending_type'])){
                $retJson = $this->model->SearchApplyData($ApplyData,2);
            }else{
                $s->logs("需求品资料保存",$ApplyData);
@@ -66,7 +70,6 @@ class ApplyController extends Controller {
                 $retJson = $this->model->SearchApplyData($ApplyData,3);
             }else{
 //                dd(1);
-                $s->logs("担保品资料保存",$ApplyData);
                 $retJson = $this->apply->apply($ApplyData,0);
             }
         }
@@ -203,9 +206,17 @@ class ApplyController extends Controller {
     public function GetIntegral(Request $request){
 
         $UserId = $request->except(['s']);
-        $Integral = DB::table('user')->where(['id'=>$UserId])->value('integral');
+//        dd($UserId);
+        $table = 'user';
+        if(isset($UserId['equipment_type']) && $UserId['equipment_type'] == 1){
+            $table = 'business_user';
+            $map['id']= $UserId['business_id'];
+        }else{
+            $map['id'] = $UserId['user_id'];
+        }
+        $Integral = DB::table($table)->where($map)->value('integral');
+//        dd($Integral);
         $retJson = returnIntegral($Integral);
-
         return response()->json($retJson);
     }
 
@@ -219,8 +230,7 @@ class ApplyController extends Controller {
 
     public function ReutrnOrderInform(Request $request){
         $Order = $request->except(['s']);
-        $s = new Logs();
-        $s->logs('支付',$Order);
+
         $orderData = DB::table('user_apply')
                         ->join('product','product.id','=','user_apply.product_id')
                         ->join('product_cat','product_cat.id','=','product.cat_id')
@@ -231,14 +241,15 @@ class ApplyController extends Controller {
                             'user_apply.order_id'=>$Order['order_id'],
                             'apply_form.equipment_type'=>$Order['applicantType']
                         ])->first();
-
+//        dd($Order['order_id']);
         //获取用户下单时的数据
         $orderForm = OrderApplyForm::where('order_id',$Order['order_id'])->first();
         $need_data = json_decode($orderForm->need_data,true);
         $content1   = json_decode($orderForm->data,true);
         $content2   = json_decode($orderData->content,true);
-        $content   = array_merge($content1,$content2);
+        $content   = array_merge($content1,$need_data);
         $use_title = ['lending_type','property','accrual','lending_cycle','is_home','is_home','company','matching','score','id','count','rate','order_id','other','other_need','audit_time'];
+//        dd($content);
         foreach ($content as $k=>$v){
             if(!in_array($k,$use_title)){
                 unset($content[$k]);
@@ -247,17 +258,30 @@ class ApplyController extends Controller {
 
         // 服务费率(金币抵用前)
         $rate               = DB::table('rate')->value('rate');
-//        $rate               = DB::table('rate')->where([
-//            'type'=>$Order['paytype']
-//        ])->value('rate');
+
+        // 获取金币数据
+
         $serverMoney        = $need_data['money'] * $rate * 10000;
+        if(isset($Order['Icon'])){
+            //如果存在金币 修改服务费用
+            // 如果存在的话 跳转到下单页面后就扣除对应的金币数额
+            // 在 user_apply 中记录金币的使用数量
+            UserApply::where('order_id',$Order['order_id'])->update([
+                'isIcon'=>$Order['Icon']
+            ]);
+
+            if($serverMoney > $Order['Icon']){
+                $serverMoney -= $Order['Icon'];
+            }else{
+                $serverMoney = 0;
+            }
+        }
         $retData            = $content;
         $retData['CountMoney']   = $serverMoney;
 
         // 服务费暂时改为 0   hongwenyang
 //        $retData['CountMoney']   = 0;
-
-
+        $retData['CountMoney'] = 0.01; // TODO 先把所有订单的金额改成 0.01元
         $retData['cat_name']   = $orderData->cat_name;
         $retData['company']   = $orderData->number;
         $retData['order_id']   = $Order['order_id'];
@@ -321,11 +345,7 @@ class ApplyController extends Controller {
         foreach($save as $k=>$v){
             $imgs[$k] = '/uploads/'.$v->store('img','img');
         }
-        if(!empty($OrderId['Icon'])){
-            $Icon = $OrderId['Icon'];
-        }else{
-            $Icon = "";
-        }
+
 
         unset($OrderId['imgs']);
         unset($OrderId['Icon']);
@@ -333,7 +353,6 @@ class ApplyController extends Controller {
 
         //如果 C端用户未支付 修改 c_apply_status  如果  C端用户已支付 修改 b_apply_status
         if(DB::table('user_apply')->where(['order_id'=>$OrderId['order_id']])->value('c_apply_status') == 0){
-
             $update['c_apply_status'] = 1;
         }else{
             $update['b_apply_status'] = 3;
@@ -350,14 +369,40 @@ class ApplyController extends Controller {
 //        ])->value('rate');
         $serverMoney        = $orderCount * $rate * 10000;
         //是否使用金币抵扣服务费
-
+        $Icon = UserApply::where('order_id',$OrderId['order_id'])->value('isIcon');
         if($Icon){
             $serverMoney = $serverMoney - $Icon;
             $update['isIcon'] = $Icon;
+            // 获取用户id
+            if(!$OrderId['type']){
+                $user_id = UserApply::where('order_id',$OrderId['order_id'])->value('user_id');
+                // 修改user 表的用户金币
+                DB::table('user')->where('id',$user_id)->decrement('integral',$Icon);
+                // 增加金币使用列表
+                $user_type = 0;
+                $type = 5;
+                $integraling = User::where('id',$user_id)->value('integral');
+            }else{
+                $user_id = Product::where('id',UserApply::where('order_id',$OrderId['order_id'])->value('product_id'))->value('business_id');
+                // 修改 business_user 表中的用户金币
+                DB::table('business_user')->where('id',$user_id)->decrement('integral',$Icon);
+                $user_type = 1;
+                $type = 5;
+                $integraling = BusinessUser::where('id',$user_id)->value('integral');
+            }
+
+            IntegralList::insert([
+                'user_id'=>$user_id,
+                'integral'=>$Icon,
+                'integraling'=>$integraling,
+                'type'=>$type,
+                'user_type'=>$user_type
+            ]);
         }
         if($OrderId['type'] == 0){
             // C端服务费
             $update['c_serve'] = $serverMoney;
+
         }else{
             // B端服务费
             $update['b_serve'] = $serverMoney;
@@ -372,11 +417,25 @@ class ApplyController extends Controller {
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * author hongwenyang
+     * method description :
+     */
 
-    public function isShen(){
-        $code = 404;
-        // 如果审核过  显示 审核通过
-        $msg  = "审核中" ;
+    public function isShen(Request $request){
+        $type = $request->input('type');
+        if(isset($type)){
+            $code = 200;
+            // 如果审核过  显示 审核通过
+            $msg  = "c端审核通过" ;
+        }else{
+            $code = 200;
+            // 如果审核过  显示 审核通过
+            $msg  = "b端审核通过" ;
+        }
+
         $j = [
             'code'=>$code,
             'msg'=>$msg
@@ -401,4 +460,6 @@ class ApplyController extends Controller {
 
         return response()->json($retData);
     }
+
+
 }
