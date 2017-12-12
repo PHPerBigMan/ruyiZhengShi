@@ -219,6 +219,7 @@ Route::group(['prefix'=>'bapi','namespace'=>'Bapi','middleware'=>'VerifyCsrfToke
     Route::any('/ta','OrderController@ta');
     Route::any('/orderBasic','OrderController@OrderBasic');
     Route::any('/getbasic','OrderController@getbasic');
+    Route::any('/getImgs','OrderController@getImgs');
     Route::any('/orderData','OrderController@OrderData');
     Route::any('/Order','OperateController@Order');
     Route::any('/blackSearch','OperateController@BlackList');

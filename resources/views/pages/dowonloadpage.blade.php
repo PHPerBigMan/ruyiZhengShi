@@ -9,3 +9,10 @@
         </div>
     </div>
 @endsection
+@section('js')
+    <script>
+        $('.dowloadOne').click(function () {
+            location.href = "http://pgyer.com/2wBS";
+        });
+    </script>
+    @endsection

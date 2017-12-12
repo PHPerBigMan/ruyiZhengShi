@@ -6,6 +6,7 @@ use App\Model\ApplyBasic;
 use App\Model\BusinessUser;
 use App\Model\Logs;
 use App\Model\Order;
+use App\Model\OrderApplyForm;
 use App\Model\Product;
 use App\Model\User;
 use App\Model\UserApply;
@@ -36,7 +37,7 @@ class OrderController extends Controller
         $OrderType['b_apply_status'] = [$OrderType['type']];
        if($OrderType['type'] == 4){
            $c_apply_status = [4,7,8];
-           $OrderType['b_apply_status'] = [3];
+           $OrderType['b_apply_status'] = [4];
        }else if($OrderType['type'] == 2){
            $c_apply_status = [4,7];
            $OrderType['b_apply_status'] = [2,3];
@@ -466,13 +467,109 @@ class OrderController extends Controller
         }else{
             $is_company = 0;
         }
-        $user = json_decode(DB::table('apply_basic_form')->where([
+
+//        $user = json_decode(DB::table('apply_basic_form')->where([
+//            'type'=>$data->order_type,
+//            'is_company'=>$is_company
+//        ])->value('data'));
+
+        $user = ApplyBasic::where([
             'type'=>$data->order_type,
             'is_company'=>$is_company
-        ])->value('data'));
+        ])->value('data');
 
+
+        // 判断用户在保存基础资料的时候有没有上传 图片 如果有则提取出来
         $retData = returnData($user);
 
         return response()->json($retData);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return array
+     * author hongwenyang
+     * method description : B端查看资料时 获取C端用户上传的所有图片数据
+     */
+
+    public function getImgs(Request $request){
+        // 以下为企业贷分类id
+        $arr = [35,36,62,63,64,65,66,67,68,69,71];
+
+        $data = DB::table('user_apply as u')->join('product as p','p.id','=','u.product_id')->where([
+            'u.order_id'=>$request->input('order_id')
+        ])->first();
+        if(in_array($data->cat_id,$arr)){
+            $is_company = 1;
+        }else{
+            $is_company = 0;
+        }
+        // 判断 基础资料里面有没有图片
+        $user = ApplyBasic::where([
+            'type'=>$data->order_type,
+            'is_company'=>$is_company
+        ])->value('data');
+
+        $imgs = [];
+        // 对图片进行判断
+
+        // 处理基础资料
+        // 营业执照图片
+        if(isset($user->companyYin) && !empty($user->companyYin)){
+            array_push($imgs,$user->companyYin);
+        }
+
+        // 行业许可证
+        if(isset($user->companyXu) && !empty($user->companyXu)){
+            array_push($imgs,$user->companyXu);
+        }
+
+        // 处理担保品资料中的图片
+        $property = OrderApplyForm::where('order_id',$request->input('order_id'))->value('data');
+
+        // 处理担保品数据
+        $property_data = json_decode($property);
+
+        // 房产证正面
+        if(isset($property_data->certificateA) && !empty($property_data->certificateA)){
+            array_push($imgs,$property_data->certificateA);
+        }
+
+        // 房产证背面
+        if(isset($property_data->certificateB) && !empty($property_data->certificateB)){
+            array_push($imgs,$property_data->certificateB);
+        }
+
+        // 汽车登记证
+        if(isset($property_data->cardj) && !empty($property_data->cardj)){
+            array_push($imgs,$property_data->cardj);
+        }
+
+        // 汽车行驶证
+        if(isset($property_data->carxs) && !empty($property_data->carxs)){
+            array_push($imgs,$property_data->carxs);
+        }
+
+        // 汽车驾驶证
+        if(isset($property_data->carjs) && !empty($property_data->carjs)){
+            array_push($imgs,$property_data->carjs);
+        }
+
+        // 应收账凭证  票据凭证
+        if(isset($property_data->imgs) && !empty($property_data->imgs)){
+            $imgs = json_decode($property_data->imgs,true);
+            foreach($imgs as $v){
+                array_push($imgs,$v);
+            }
+        }
+
+        // 汽车驾驶证
+        if(isset($property_data->Shangbiao) && !empty($property_data->Shangbiao)){
+            array_push($imgs,$property_data->Shangbiao);
+        }
+
+
+        return returnData($imgs);
     }
 }

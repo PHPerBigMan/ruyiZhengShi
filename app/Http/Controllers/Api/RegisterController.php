@@ -241,8 +241,10 @@ class RegisterController extends Controller {
             if($isUser->password == $loginData['password']){
                 if($loginData['userType'] == 0){
                     $name = 'user_id';
+                    $pre = 'bmf-ruyijingfu-c';
                 }else{
                     $name = 'business_id';
+                    $pre = 'bmf-ruyijingfu-b';
                 }
                 $request->session()->put($name,$isUser->id);
                 //判断用户是否是推荐注册用户

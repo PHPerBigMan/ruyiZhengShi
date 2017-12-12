@@ -15,7 +15,11 @@ use Illuminate\Support\Facades\Storage;
 class BusinessUser extends Model{
     protected $table = 'business_user';
 
-    
+    public function getCreateTimeAttribute($value){
+        return date('YmdHis',strtotime($value));
+    }
+
+
     /**
      * @param $data
      * @return mixed

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Bapi;
 
 use App\Model\BusinessUser;
+use App\Model\IntegralChange;
 use App\Model\Logs;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -26,7 +27,7 @@ class UserController extends Controller
      */
     public function UserInfo(Request $request){
         $userData = $request->except('s');
-        $data = DB::table('business_user')->where(['id'=>$userData['business_id']])
+        $data = BusinessUser::where(['id'=>$userData['business_id']])
             ->first();
 //        dd($data);
         if(empty($data->imgs)){
@@ -204,7 +205,13 @@ class UserController extends Controller
             'id'=>$pData['business_id']
         ])->value('integral');
         $needintegral  = DB::table('integral_change')->value('need') * $pData['num'];
-        if($UserIntegral< $needintegral){
+        // 查看保护名额的库存
+        $stock = IntegralChange::where('id',1)->value('stock');
+        if($stock <= 0){
+            $retJson['msg']  = "保护名额库存不足";
+            $retJson['code'] = 403;
+        }
+        else if($UserIntegral< $needintegral){
             $retJson['msg']  = "剩余金币不足";
             $retJson['code'] = 403;
         }else{
@@ -236,6 +243,9 @@ class UserController extends Controller
                     // 排名保护没有失效 进行时间的更换
                     BusinessUser::where('id',$pData['business_id'])->increment('stop_time',$pData['num'] * (60*60*24));
                 }
+
+                // 修改保护库存数据
+                IntegralChange::where('id',1)->decrement('stock');
                 $retJson['msg']  = "购买成功";
                 $retJson['code'] = 200;
             }else{

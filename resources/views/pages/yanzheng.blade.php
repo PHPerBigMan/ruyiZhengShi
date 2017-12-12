@@ -3,7 +3,7 @@
 @section('content')
     <div class="register">
         <ul class="register-top">
-            <h4 class="reg_titel">如意金服，您的借贷神器</h4>
+            <h4 class="reg_titel">如易金服，您的借贷神器</h4>
             <li>
                 <h4>手机号</h4>
                 <input class="li-inp" type="text" placeholder="请输入手机号" id="phone">
@@ -48,11 +48,17 @@
 
         <input type="hidden" id="userType" value="{{ $type }}">
 
-        <a  class="register logbtn" id="register">注册并登陆</a>
+        <a  class=" logbtn" id="register">注册并登陆</a>
     </div>
 @endsection
 @section('js')
     <script>
+
+
+        var y =document.body.clientHeight;
+
+        $(".register").height(y);
+
         $('.checkbox-inner').click(function () {
             var is_checked = $('#is_checked');
             if(is_checked.val() == 0){
@@ -173,7 +179,7 @@
                 wait = 30;
             } else { // www.jbxue.com
                 o.attr("disabled", true);
-                o.text("重新发送(" + wait + ")");
+                o.text(wait+"s");
                 wait--;
                 setTimeout(function() {
                         time(o)

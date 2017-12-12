@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Model\BusinessUser;
 use App\Model\Config;
 use App\Model\Logs;
+use App\Model\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mockery\Exception;
@@ -27,8 +28,7 @@ class UserController extends Controller {
     public function UserInfo(Request $request){
         $userData = $request->except('s');
 
-        $data = DB::table('user')->where(['id'=>$userData['user_id']])
-            ->select('user_name','user_sex','user_sign','user_pic','user_idcard','integral','remaining_sum','phone','qrcode')
+        $data = User::where(['id'=>$userData['user_id']])
             ->first();
 
         $j = returnData($data);
@@ -346,6 +346,42 @@ class UserController extends Controller {
                     $syDay = ceil(($isBuy->stop_time - time()) / 60 /60/ 24);
                 }else{
                     $syDay = 0;
+                }
+            }
+
+            if(!($Inlist->isEmpty())){
+                foreach ($Inlist as $v){
+                    switch ($v->type){
+                        case 0:
+                            $v->degree = 1;
+                            $v->typeMsg = "注册成功";
+                            break;
+                        case 1:
+                            $v->degree = 1;
+                            $v->typeMsg = "邀请他人注册成功";
+                            break;
+                        case 2:
+                            $v->degree = 1;
+                            $v->typeMsg = "借款成功";
+                            break;
+                        case 3:
+                            $v->degree = 1;
+                            $v->typeMsg = "还款无违约";
+                            break;
+                        case 4:
+                            $v->degree = 1;
+                            $v->typeMsg = "还款完成";
+                            break;
+                        case 5:
+                            $v->degree = 0;
+                            $v->typeMsg = "支出消耗";
+                            break;
+                        default:
+                            $v->degree = 0;
+                            $v->typeMsg = "购买排名保护";
+                            break;
+                    }
+                    $v->create_time = date("Y-m-d",strtotime($v->create_time));
                 }
             }
         }

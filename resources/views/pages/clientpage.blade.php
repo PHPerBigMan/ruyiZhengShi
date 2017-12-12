@@ -12,7 +12,11 @@
 @section('js')
     <script>
         $('.dowloadOne').click(function () {
-            location.href = "http://pgyer.com/2wBS";
-        })
+            location.href = "https://www.pgyer.com/yJRp";
+        });
+
+        $('.dowloadTow').click(function () {
+            location.href = "{{ URL }}{{ $datac }}";
+        });
     </script>
     @endsection

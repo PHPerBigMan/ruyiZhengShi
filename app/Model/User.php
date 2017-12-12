@@ -18,4 +18,8 @@ class User extends Model
         return '否';
     }
 
+    public function getCreateTimeAttribute($value){
+        return date('YmdHis',strtotime($value));
+    }
+
 }

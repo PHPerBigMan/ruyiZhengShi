@@ -91,8 +91,8 @@ class PayController extends Controller
      */
 
     public function getInfo(Request $request){
-        $s = new Logs();
-        $s->logs('连连支付异步回调',$request->all());
+//        $s = new Logs();
+//        $s->logs('连连支付异步回调',$request->all());
        $notify_data = $request->all();
        if($notify_data['result_pay'] == "SUCCESS"){
            // 支付成功
@@ -136,6 +136,9 @@ class PayController extends Controller
         //如果存在转义字符，那么去掉转义
         if(get_magic_quotes_gpc()){$arg = stripslashes($arg);}
         //file_put_contents("log.txt","转义后:".$arg."\n", FILE_APPEND);
+
+        $s = new Logs();
+        $s->logs('对待签名参数数组排序',$arg);
         return $arg;
     }
 
@@ -161,6 +164,8 @@ class PayController extends Controller
         //base64编码
         $sign = base64_encode($sign);
         //file_put_contents("log.txt","签名原串:".$data."\n", FILE_APPEND);
+
+
         return $sign;
     }
 
@@ -176,6 +181,8 @@ class PayController extends Controller
         $para_filter = $this->paraFilter($para_temp);
         //对待签名参数数组排序
         $para_sort = $this->argSort($para_filter);
+
+
         //生成签名结果
         $mysign = $this->buildRequestMysign($para_sort);
 

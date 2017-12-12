@@ -91,7 +91,7 @@ class ProductController extends Controller {
         $CatName = DB::table('product_cat')->where(['id'=>DB::table('product_cat')->where(['id'=>$PropertyCatId])->value('p_id')])->value('cat_name');
 
         $table = 'house_property';
-        $key = ['jifen','house_status','count_money','job','license','decorate','accrual','product_cycle','add_product_cycle','type','life','house_type','use','lending_cycle','lending_type','money','property','around','credit'];
+        $key = ['car_year','gongZi','jifen','house_status','count_money','job','license','decorate','accrual','product_cycle','add_product_cycle','type','life','house_type','use','lending_cycle','lending_type','money','property','around','credit'];
         $data = DB::table($table)->where(['cat_id'=>$PropertyCatId['cat_id']])->first();
 
 

@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Storage;
 class ApplyBasic extends Model{
     protected $table = 'apply_basic_form';
 
+    public function getDataAttribute($value){
+        return json_decode($value);
+    }
     /**
      * @param $data
      * @return mixed
@@ -221,6 +224,46 @@ class ApplyBasic extends Model{
 
         }else{
             $retData = json_decode(DB::table('apply_form')->where(['user_id'=>$data['user_id'],'cat_id'=>$data['cat_id'],'equipment_type'=>$data['applicantType']])->value('data'),true);
+
+            if(empty($retData)){
+                $retData = json_decode('{}');
+                if($data['cat_id'] == 65){
+                    $retData->YinShou = "";
+                }else if($data['cat_id'] == 67 || $data['cat_id'] == 68){
+                    $retData->type = "";
+                    $retData->owner = "";
+                    $retData->mortgage = "";
+                    $retData->credit = "";
+                }else if($data['cat_id'] == 66){
+                    $retData->area = "";
+                    $retData->type = "";
+                    $retData->Shangbiao = "";
+                    $retData->mortgage = "";
+                }else if($data['cat_id'] == 62){
+                    $retData->area = "";
+                    $retData->measure = "";
+                    $retData->certificateA = "";
+                    $retData->certificateB = "";
+                    $retData->title_card = "";
+                    $retData->credit = "";
+                    $retData->mortgage = "";
+                    $retData->frozen = "";
+                    $retData->certificate_type = "";
+                    $retData->daikuan = "";
+                    $retData->owner = "";
+                    $retData->type = "";
+                }else if($data['cat_id'] == 64 || $data['cat_id'] == 63){
+                    $retData->area = "";
+                    $retData->type = "";
+                    $retData->life = "";
+                }else if($data['cat_id'] == 35 || $data['cat_id'] == 36){
+                    $retData->area = "";
+                    $retData->owner = "";
+                    $retData->property = "";
+                    $retData->other = "";
+                    $retData->type	 = "";
+                }
+            }
         }
 
         $retJson['code'] = 200;
