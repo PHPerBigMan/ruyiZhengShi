@@ -359,6 +359,7 @@ class ApplyController extends Controller {
         }
 //        unset($OrderId['type']);
         //保存数据
+
         $s = DB::table('yinlian')->insert($OrderId);
 
         // 记录b端服务费

@@ -475,7 +475,8 @@ class OrderController extends Controller
 
         $user = ApplyBasic::where([
             'type'=>$data->order_type,
-            'is_company'=>$is_company
+            'is_company'=>$is_company,
+            'user_id'=>$data->user_id
         ])->value('data');
 
 
@@ -508,9 +509,12 @@ class OrderController extends Controller
         // 判断 基础资料里面有没有图片
         $user = ApplyBasic::where([
             'type'=>$data->order_type,
-            'is_company'=>$is_company
+            'is_company'=>$is_company,
+            'user_id'=>$data->user_id
         ])->value('data');
-
+//        dump('cat_id-'+$data->cat_id);
+//        dump('is_company-'+$is_company);
+//        dd($user);die;
         $imgs = [];
         // 对图片进行判断
 

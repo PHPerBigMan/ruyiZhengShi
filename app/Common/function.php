@@ -644,8 +644,8 @@ function BusinessOrderData($data,$type){
         }
         $v->cat_name            = DB::table('product_cat')->where(['id'=>$v->p_id])->value('cat_name') .'-'. $v->cat_name;
         $product                = json_decode($v->pData,true);
-        $v->is_home             = $product['is_home'];
-        $v->product_cycle             = $product['product_cycle'];
+        $v->is_home             = isset($product['is_home']) ? $product['is_home'] : "";
+        $v->product_cycle       = isset($product['product_cycle']) ?$product['product_cycle'] :'';
 //        $v->lending_cycle       = $product['lending_cycle'];
         $v->accrual             = $v->accrual;
         foreach ($product as $k1=>$v1){
