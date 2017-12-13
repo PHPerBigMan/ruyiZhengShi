@@ -644,8 +644,8 @@ function BusinessOrderData($data,$type){
         }
         $v->cat_name            = DB::table('product_cat')->where(['id'=>$v->p_id])->value('cat_name') .'-'. $v->cat_name;
         $product                = json_decode($v->pData,true);
-        $v->is_home             = isset($product['is_home']) ? $product['is_home'] : "";
-        $v->product_cycle       = isset($product['product_cycle']) ?$product['product_cycle'] :'';
+        $v->is_home             = $product['is_home'];
+        $v->product_cycle             = $product['product_cycle'];
 //        $v->lending_cycle       = $product['lending_cycle'];
         $v->accrual             = $v->accrual;
         foreach ($product as $k1=>$v1){
@@ -667,8 +667,8 @@ function BusinessOrderData($data,$type){
         if($v->order_type == 0){
             //获取用户基本信息
             $UserBasic = json_decode(DB::table('apply_basic_form')->where(['user_id'=>$v->user_id,'type'=>0])->value('data'),true);
-            $v->userName    =$UserBasic['name'];
-            $v->userPhone   =$UserBasic['phone'];
+            $v->userName    = empty($UserBasic['name']) ? "" :$UserBasic['name'];
+            $v->userPhone   = empty($UserBasic['phone']) ?"" :$UserBasic['phone'];
         }else{
             $CompanyBasic = DB::table('business_user')->where(['id'=>$v->user_id])->select('companyName','phone')->first();
             $UserBasic = json_decode(DB::table('apply_basic_form')->where(['user_id'=>$v->user_id,'type'=>1])->value('data'),true);

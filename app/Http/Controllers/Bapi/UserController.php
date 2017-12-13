@@ -99,8 +99,8 @@ class UserController extends Controller
         if(empty(DB::table('business_user')->where($map)->value('number'))){
             $SaveData['number'] = 'R'.$map['id'];
         }
-        // 如果用户是第一次修改   状态改为审核中
-        if(empty(BusinessUser::where($map)->value('companyName'))){
+        // 如果状态为0   状态改为审核中
+        if(!BusinessUser::where($map)->value('is_pass')){
             $SaveData['is_pass'] = 2;
         }
 

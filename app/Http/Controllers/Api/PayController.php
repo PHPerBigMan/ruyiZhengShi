@@ -91,10 +91,10 @@ class PayController extends Controller
      */
 
     public function getInfo(Request $request){
-//        $s = new Logs();
-//        $s->logs('连连支付异步回调',$request->all());
-       $notify_data = $request->all();
-       if($notify_data['result_pay'] == "SUCCESS"){
+        $notify_data = $request->all();
+        $s = new Logs();
+        $s->logs($notify_data['no_order'],$request->all());
+        if($notify_data['result_pay'] == "SUCCESS"){
            // 支付成功
            if($notify_data['info_order'] == 2){
                // B端支付 修改支付状态
@@ -136,9 +136,9 @@ class PayController extends Controller
         //如果存在转义字符，那么去掉转义
         if(get_magic_quotes_gpc()){$arg = stripslashes($arg);}
         //file_put_contents("log.txt","转义后:".$arg."\n", FILE_APPEND);
-
-        $s = new Logs();
-        $s->logs('对待签名参数数组排序',$arg);
+//
+//        $s = new Logs();
+//        $s->logs('对待签名参数数组排序',$arg);
         return $arg;
     }
 
