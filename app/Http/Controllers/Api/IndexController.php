@@ -96,15 +96,29 @@ class IndexController extends Controller {
 
     public function About(Request $request){
         $a = $request->input('type');
+
+        $article = $request->input('article_type');
+
+
         if(!isset($a) || $a == 0){
-            //C端
-            $type = 2;
+            if(isset($article) && $article == 1){
+                $type = [0];
+            }else{
+                $type = [2];
+            }
         }else{
-            //B端
-            $type = 12;
+//            $ss = new Logs();
+//            $ss->logs('获取服务协议',$request->except(['s']));
+            if(isset($article) && $article == 1){
+                $type = [0];
+            }else{
+                $type = [12];
+            }
+
         }
 
-        $data = DB::table('article')->where(['type'=>$type])->select('title','id','content','create_time')->get();
+        $data = DB::table('article')->whereIn('type',$type)->select('title','id','content','create_time')->orderBy('type','desc')->get();
+
 
         $j = returnData($data);
 

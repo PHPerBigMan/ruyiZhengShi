@@ -58,15 +58,9 @@ class OrderController extends Controller
                 'b_apply_status'=>9
             ];
         }else if($type == 4){
-            //已成交订单
-            $title = "orderDone";
-            $where = [
-                'c_apply_status'=>8,
-                'b_apply_status'=>7,
-            ];
-            $whereOr = [
-//                'b_apply_status'=>7
-            ];
+            // 所有订单
+            $title = "orderAll";
+            $whereIn = [0,1,2,3,4,5,6,7,8,9];
         }else if($type == 5){
             //C端用户取消订单
             $title = "ordercancel";
@@ -81,6 +75,10 @@ class OrderController extends Controller
             // 申请退款的订单和退款成功订单
             $title = "ordertui";
             $whereIn = [4,5];
+        }else if($type == 8){
+            // 已成交订单
+            $title = "orderDone";
+            $whereIn = [8];
         }
         $time=  isset($_GET['exTime']) ? $_GET['exTime'] :"";
 
@@ -101,6 +99,7 @@ class OrderController extends Controller
                 $data = $this->model->BackOrder($_GET['keyword'],$where,$whereOr,$whereIn,$startTime,$endTime,$nextTime);
             }else{
                 $data = $this->model->BackOrder("",$where,$whereOr,$whereIn,$startTime,$endTime,$nextTime);
+//                dd($startTime);
             }
         }else{
             if(isset($_GET['keyword']) && $_GET['keyword'] != ""){

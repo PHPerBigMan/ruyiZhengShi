@@ -6,6 +6,7 @@ use App\Model\Logs;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mockery\Exception;
 
 class ProductController extends Controller
@@ -19,7 +20,7 @@ class ProductController extends Controller
 
     public function ProductList(Request $request){
         $CatId = $request->except(['s']);
-        $ProductData = DB::table('product')->where($CatId)->whereIn('is_show',[0,1])->select('id','content','is_show','create_time','cat_id')->get();
+        $ProductData = DB::table('product')->where($CatId)->whereIn('is_show',[0,1])->select('id','content','is_show','create_time','cat_id')->orderBy('create_time','desc')->get();
 
 //        dd($ProductData);
         foreach($ProductData as $k=>$v){
@@ -62,16 +63,13 @@ class ProductController extends Controller
      * method description : 保存产品数据
      */
     public function ProductSave(Request $request){
+     
         $ProductData = $request->except(['s']);
-
         $business_id = $ProductData['business_id'];
         $cat_id      = $ProductData['cat_id'];
-
         unset($ProductData['business_id']);
         unset($ProductData['cat_id']);
-
         $ProductData['district'] = isset($ProductData['area']) ? $ProductData['area'] : "";
-
         //处理产品范围数据
         $save['province'] = "不限";
         $save['city'] = "不限";
@@ -79,13 +77,26 @@ class ProductController extends Controller
         // 添加产品类型
 //        $ProductData['type'] = DB::table('product_cat')->where('id',$cat_id)->value('cat_name');
 
-        if(isset($ProductData['area']) && $ProductData['area'] != "null" && $ProductData['area']!= "不限"){
-                $dizhi = explode(' ',$ProductData['area']);
+//        if(isset($ProductData['area']) && $ProductData['area'] != "null" && $ProductData['area']!= "不限"){
+//                $dizhi = explode(' ',$ProductData['area']);
+//                $save['province'] = $dizhi[0];
+//                $save['city'] = $dizhi[1];
+//                $save['district'] = $dizhi[2];
+//
+//        }else{
+//
+//        }
+        if(isset($ProductData['area'])){
+            $dizhi[1] = "";
+            $dizhi[2] = "";
+            $dizhi = explode(' ',$ProductData['area']);
+            if(is_array($dizhi)){
                 $save['province'] = $dizhi[0];
-                $save['city'] = $dizhi[1];
-                $save['district'] = $dizhi[2];
-
+                $save['city']     = empty($dizhi[1]) ? "不限" : $dizhi[1];
+                $save['district'] = empty($dizhi[2]) ? "不限" : $dizhi[2];
+            }
         }
+
 
         if(empty($ProductData['id'])){
             $s = DB::table('product')->insert([

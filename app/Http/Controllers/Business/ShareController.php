@@ -66,6 +66,11 @@ class ShareController extends Controller
             'user_id'=>session('business_admin'),
             'type'=>1,
         ])->value('data'));
+
+        if(empty($basic)){
+            $basic = json_decode('{}');
+            $basic->name = "";
+        }
         $data = DB::table('apply_form')->where([
             'user_id'=>session('business_admin'),
             'equipment_type'=>1,
@@ -124,7 +129,6 @@ class ShareController extends Controller
             'data'=>$data,
             'user_id'=>session('business_admin')
         ];
-
 
         $view = "Business.share.index_".$sec;
         return view($view,$j);

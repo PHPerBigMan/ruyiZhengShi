@@ -39,9 +39,12 @@ Route::group(['prefix'=>'back','namespace'=>'Back'],function(){
     Route::get('/loginout','LoginController@loginout');
 });
 
-Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>'IsLogin'],function(){
+Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin','userPermession']],function(){
     Route::get('/','IndexController@index');
     Route::get('/admin','AdminController@index');
+    Route::post('/admin/del','AdminController@del');
+    Route::post('/admin/add','AdminController@add');
+    Route::post('/admin/edit','AdminController@edit');
     Route::get('dashboard','IndexController@detail');
     Route::get('/product/Plist','ProductController@Plist');
     Route::get('/product/SecCat/{pid}','ProductController@SecCat');
@@ -53,6 +56,7 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>'IsLogin'],func
     Route::post('/product/CatAdd','ProductController@CatAdd');
     Route::get('/product/product','ProductController@product');
     Route::get('/user/{type}','UserController@UserList');
+    Route::get('/demo','UserController@demo');
     Route::get('user/detail/{id}', 'UserController@show')->name('user.detail');
     Route::get('company/detail/{id}', 'UserController@showCompany')->name('company.detail');
 
@@ -70,6 +74,17 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>'IsLogin'],func
     Route::get('product/check/{id}', 'ProductController@showCheck');
     Route::post('product/change/status', 'ProductController@editStatus');
     Route::get('/excel', 'ExcelController@excel');
+    Route::get('/error', 'AdminController@PerMessionError');
+    Route::get('/data', 'AdminController@dataTotal');
+    Route::get('/todayTotal', 'DataTotalController@CatTodayTotal');
+    Route::get('/typeChoose', 'DataTotalController@TotalType');
+    Route::get('/areaList', 'DataTotalController@AreaList');
+
+});
+
+Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin']],function(){
+    Route::get('/error', 'AdminController@PerMessionError');
+
 });
 // B端后台路由
 Route::group(['prefix'=>'business','namespace'=>'Business'],function(){

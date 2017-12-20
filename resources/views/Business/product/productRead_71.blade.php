@@ -145,7 +145,7 @@
                 <label class="layui-form-label">征信要求 :</label>
                 <div class="layui-input-block">
                     <select name="credit">
-                        <?php $title = ['不限','无逾期'];?>
+                        <?php $title = ['一年内逾期超过3次或超过90天','一年内逾期少于3次且少于90天','信用良好无逾期'];?>
                         @foreach($title as $v)
                             <option value="{{ $v }}" @if($v === $product['credit']) selected="" @endif>{{ $v }}</option>
                         @endforeach

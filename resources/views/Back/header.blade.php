@@ -10,7 +10,7 @@
   {{--<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.csss">--}}
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <link rel="stylesheet" href="{{ URL::asset('css/AdminLTE.min.css') }}">
-  <link rel="stylesheet" href="{{ URL::asset('css/admin.css?v_4') }}">
+  <link rel="stylesheet" href="{{ URL::asset('css/admin.css?v_5') }}">
   <link rel="stylesheet" href="{{ URL::asset('dist/css/skins/_all-skins.min.css') }}">
   <link rel="stylesheet" href="{{ URL::asset('plugins/iCheck/flat/blue.css') }}">
   <link rel="stylesheet" href="{{ URL::asset('plugins/morris/morris.css') }}">
@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="{{ URL::asset('layui/css/layui.css') }}"  media="all">
   <link rel="stylesheet" href="{{ URL::asset('css/zoomify.min.css') }}">
   <!-- 引入样式 -->
-  {{--<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">--}}
+
   <!-- 引入组件库 -->
 
   <!--[if lt IE 9]>
@@ -52,7 +52,6 @@
 {{--<script src="{{ URL::asset('dist/js/pages/dashboard.js') }}"></script>--}}
 <script src="{{ URL::asset('dist/js/demo.js') }}"></script>
 <script src="{{ URL::asset('dist/js/admin.js') }}"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script src="https://cdn.bootcss.com/layer/3.0.3/layer.js"></script>
 <script src="{{ URL::asset('layui/layui.js') }}"></script>
 <script src="{{ URL::asset('layui/layui.all.js') }}"></script>

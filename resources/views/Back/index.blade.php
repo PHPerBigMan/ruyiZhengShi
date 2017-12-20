@@ -57,6 +57,7 @@
                 'ordercancel',
                 'orderbcancel',
                 'ordertui',
+                'orderAll'
             ];
             ?>
           <li class="layui-nav-item <?php if(in_array($Pagetitle,$title)){echo 'layui-nav-itemed';}?>" >
@@ -64,12 +65,13 @@
             <dl class="layui-nav-child">
               <dd class="<?php if($Pagetitle == 'orderBasic'){echo 'layui-this';}?>"><a href="/back/order/1"  id="">B端支付待审核</a></dd>
               <dd class="<?php if($Pagetitle == 'orderShare'){echo 'layui-this';}?>"><a href="/back/order/0"  id="">C端支付待审核</a></dd>
-              <dd class="<?php if($Pagetitle == 'orderPassed'){echo 'layui-this';}?>"><a href="/back/order/2" id="">审核已通过订单</a></dd>
+              <!--<dd class="<?php if($Pagetitle == 'orderPassed'){echo 'layui-this';}?>"><a href="/back/order/2" id="">审核已通过订单</a></dd>-->
               <dd class="<?php if($Pagetitle == 'orderNoPassed'){echo 'layui-this';}?>"><a href="/back/order/3" id="">审核未通过订单</a></dd>
-              <dd class="<?php if($Pagetitle == 'orderDone'){echo 'layui-this';}?>"><a href="/back/order/4" id="">已成交订单</a></dd>
               <dd class="<?php if($Pagetitle == 'ordercancel'){echo 'layui-this';}?>"><a href="/back/order/5">C端用户取消订单</a></dd>
               <dd class="<?php if($Pagetitle == 'orderbcancel'){echo 'layui-this';}?>"><a href="/back/order/6">B端用户取消订单</a></dd>
               <dd class="<?php if($Pagetitle == 'ordertui'){echo 'layui-this';}?>"><a href="/back/order/7">退款订单</a></dd>
+              <dd class="<?php if($Pagetitle == 'orderDone'){echo 'layui-this';}?>"><a href="/back/order/8" id="">成交订单</a></dd>
+              <dd class="<?php if($Pagetitle == 'orderAll'){echo 'layui-this';}?>"><a href="/back/order/4" id="">所有订单</a></dd>
             </dl>
           </li>
 
@@ -103,7 +105,17 @@
               <dd class="<?php if($Pagetitle == 'settingServe'){echo 'layui-this';}?>"><a href="/back/setting/serve" @click="secondCat()" id="">服务费比例</a></dd>
             </dl>
           </li>
-
+            <?php
+            $title = [
+                'data'
+            ];
+            ?>
+          <li class="layui-nav-item <?php if(in_array($Pagetitle,$title)){echo 'layui-nav-itemed';}?>">
+            <a class="" href="javascript:;">成交额统计</a>
+            <dl class="layui-nav-child">
+              <dd class="<?php if($Pagetitle == 'data'){echo 'layui-this';}?>"><a href="/back/typeChoose?type=1">数据统计</a></dd>
+            </dl>
+          </li>
             <?php
             $title = [
                 'admin',
@@ -115,6 +127,8 @@
               <dd class="<?php if($Pagetitle == 'admin'){echo 'layui-this';}?>"><a href="/back/admin">账号管理</a></dd>
             </dl>
           </li>
+
+
         </ul>
       </div>
     </div>

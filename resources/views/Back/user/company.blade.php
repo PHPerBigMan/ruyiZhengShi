@@ -12,8 +12,13 @@
     <p>是否拥有金融资质：{{ $user->qualification }}</p>
     <p>
         企业执照：
-        <img src="{{ $user->pic }}" alt="" width="400px">
+        <img src="{{ $user->pic }}" alt="" width="400px" class="img">
     </p>
     <p>成交单数： {{ $order->orders_count }}</p>
     <p>总成交金额：{{ $order->total_money or 0}}</p>
 @endsection
+@section('js')
+    <script>
+        $('.img').zoomify();
+    </script>
+    @endsection

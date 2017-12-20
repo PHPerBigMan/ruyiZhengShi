@@ -43,6 +43,9 @@
                 <th>产品所属企业</th>
                 <th>产品所属企业编号</th>
                 <th>产品分类</th>
+                @if($type ==4)
+                    <th>订单状态</th>
+                @endif
                 <th>支付凭证</th>
                 <th>创建时间</th>
                 @if($type == 7)
@@ -67,6 +70,23 @@
                     <td>{{ $value->companyName }}</td>
                     <td>{{ $value->number }}</td>
                     <td>{{ $value->cat_name }}</td>
+                    @if($type ==4)
+                    <td class="red-font">
+                        @if($value->c_apply_status == 0 || $value->c_apply_status == 1 || $value->c_apply_status == 2 || $value->c_apply_status == 3 || $value->c_apply_status == 4)
+                            未完成
+                            @elseif($value->c_apply_status == 5)
+                            退款中
+                            @elseif($value->c_apply_status == 6)
+                            已退款
+                            @elseif($value->c_apply_status == 7)
+                            等待放款
+                            @elseif($value->c_apply_status == 8)
+                            放款成功
+                            @elseif($value->c_apply_status == 9)
+                            C端支付驳回
+                            @endif
+                    </td>
+                    @endif
                     <td>
                         @if($type == 0 || $type ==1)
                         <img src="{{ $value->img }}" alt="" class="img">

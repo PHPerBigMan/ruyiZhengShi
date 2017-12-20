@@ -60,5 +60,6 @@ class Kernel extends HttpKernel
         'BusinessIsLogin' => \App\Http\Middleware\BusinessIsLogin::class,
         'VerifyCsrfToken' => \App\Http\Middleware\VerifyCsrfToken::class,
         'HasInformation' => \App\Http\Middleware\HasInformation::class,
+        'userPermession' => \App\Http\Middleware\UserPermession::class,
     ];
 }

@@ -603,6 +603,7 @@ function ProductSort($CheckProduct,$SortKey){
                 }
             }
         }
+
     }
     foreach($CheckProduct as $k=>$v){
         $CheckProduct[$k]['matching'] = $v['matching'].'%';
@@ -610,6 +611,39 @@ function ProductSort($CheckProduct,$SortKey){
     return $CheckProduct;
 }
 
+/**
+ * @param $data
+ * @param $SortKey
+ * @return array
+ * author hongwenyang
+ * method description : 获取所有匹配到的产品数据  并且根据企业是否购买排名保护 进行序列的调整
+ */
+function getIsBuy($data,$SortKey){
+    $isBuy = array();
+    $notBuy = array();
+    $AllData= array();
+    if(!empty($data)){
+        foreach ($data as $k=>$v){
+            if($v['is_buy']){
+                // 购买了 报名保护
+                $isBuy[$k] = $v;
+            }else{
+                $notBuy[$k] = $v;
+            }
+        }
+        // 对购买排名保护的产品进行排序
+        if(!empty($isBuy)){
+            $isBuy = ProductSort($isBuy,$SortKey);
+        }
+        // 对未购买排名保护的产品进行排序
+        if(!empty($notBuy)){
+            $notBuy = ProductSort($notBuy,$SortKey);
+        }
+        $AllData = array_merge($isBuy,$notBuy);
+
+    }
+    return $AllData;
+}
 /**
  * @param $data
  * @param $type

@@ -154,6 +154,8 @@ class ApplyForm extends Model{
                 $CheckProduct[$k]               = json_decode($v->content,true);
                 $CheckProduct[$k]['matching']   = 0;
                 $CheckProduct[$k]['id']         = $v->id;
+                $CheckProduct[$k]['business_id']= $v->business_id;
+                $CheckProduct[$k]['is_buy']     = BusinessUser::where('id',$v->business_id)->value('is_buy');
                 $CheckProduct[$k]['company']    = $v->number;
                 $CheckProduct[$k]['score']      = round(DB::table('product_evaluate')->where(['product_id'=>$v->id])->avg('score'),1);
                 $CheckProduct[$k]['count']      = DB::table('user_apply')->where(['product_id'=>$v->id])->count();
@@ -344,25 +346,24 @@ class ApplyForm extends Model{
             }
 
             if(!empty($ApplyData['city'])){
-
                 // 根据用户定位对数据进行重新组合
                 if(!empty($SameCity) && (empty($DifferentCity))){
 
-                    $SameData       = ProductSort($SameCity,$ApplyData['sort']);
+                    $SameData       = getIsBuy($SameCity,$ApplyData['sort']);
                     $CheckProduct   = $SameData;
                 }else if((empty($SameCity)) && (!empty($DifferentCity))){
 
-                    $DifferentData  = ProductSort($DifferentCity,$ApplyData['sort']);
+                    $DifferentData  = getIsBuy($DifferentCity,$ApplyData['sort']);
                     $CheckProduct   = $DifferentData;
                 }else if(!empty($DifferentCity) && !empty($SameCity)){
 
-                    $SameData       = ProductSort($SameCity,$ApplyData['sort']);
-                    $DifferentData  = ProductSort($DifferentCity,$ApplyData['sort']);
+                    $SameData       = getIsBuy($SameCity,$ApplyData['sort']);
+                    $DifferentData  = getIsBuy($DifferentCity,$ApplyData['sort']);
                     $CheckProduct   = array_merge($SameData,$DifferentData);
                 }
             }else{
 
-                $CheckProduct = ProductSort($CheckProduct,$ApplyData['sort']);
+                $CheckProduct = getIsBuy($CheckProduct,$ApplyData['sort']);
             }
 
         }else{

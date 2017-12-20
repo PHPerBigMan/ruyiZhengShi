@@ -54,6 +54,7 @@ class ApplyController extends Controller {
             if(empty($ApplyData['name'])){
                 $retJson = $this->model->SearchApplyData($ApplyData,1);
             }else{
+
                 $retJson =  $this->model->applyBasic($ApplyData);
             }
         }else if($ApplyData['request'] == 2){
@@ -280,8 +281,6 @@ class ApplyController extends Controller {
         $retData['CountMoney']   = $serverMoney;
 
         // 服务费暂时改为 0   hongwenyang
-//        $retData['CountMoney']   = 0;
-        $retData['CountMoney'] = 0.01; // TODO 先把所有订单的金额改成 0.01元
         $retData['cat_name']   = $orderData->cat_name;
         $retData['company']   = $orderData->number;
         $retData['order_id']   = $Order['order_id'];
@@ -427,14 +426,16 @@ class ApplyController extends Controller {
     public function isShen(Request $request){
         $type = $request->input('type');
         if(isset($type)){
-            $code = 200;
+            $code = 404;
             // 如果审核过  显示 审核通过
-            $msg  = "c端审核通过" ;
+//            $msg  = "c端审核通过" ;
+            $msg  = "审核未通过" ;
         }else{
             $code = 200;
             // 如果审核过  显示 审核通过
             $msg  = "b端审核通过" ;
         }
+
 
         $j = [
             'code'=>$code,

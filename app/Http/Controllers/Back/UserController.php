@@ -43,17 +43,17 @@ class UserController extends Controller
                     'user_name'=>$keyword
                 ])->orWhere([
                     'phone'=>$keyword
-                ])->paginate(10);
+                ])->orderBy('create_time','desc')->paginate(10);
             }else{
                 $data = DB::table($table)->orWhere([
                     'companyName'=>$keyword
                 ])->orWhere([
                     'phone'=>$keyword
-                ])->paginate(10);
+                ])->orderBy('create_time','desc')->paginate(10);
             }
 
         }else{
-            $data = DB::table($table)->paginate(10);
+            $data = DB::table($table)->orderBy('create_time','desc')->paginate(10);
         }
 
         $j = [
@@ -102,5 +102,11 @@ class UserController extends Controller
             ->select(DB::raw('sum(order_count) as total_money, count(*) as orders_count'))
             ->first();
         return view('Back.user.company', compact('user', 'Pagetitle', 'order'));
+    }
+
+
+    public function demo(){
+        $data = User::inRandomOrder()->first();
+        dd($data);
     }
 }
