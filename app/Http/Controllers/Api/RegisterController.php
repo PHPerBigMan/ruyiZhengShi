@@ -8,9 +8,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Model\BusinessChild;
 use App\Model\BusinessUser;
 use App\Model\Logs;
 use App\Model\Product;
+use App\Model\User;
+use App\Model\UserApply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -234,6 +237,18 @@ class RegisterController extends Controller {
         }else{
            $table  = 'business_user';
             $isUser = DB::table($table)->where(['phone'=>$loginData['phone']])->orWhere(['companyCode'=>$loginData['phone']])->first();
+            // TODO:: 这里多加一个判断  判断是否是子账号
+            if(empty($isUser)){
+                $isChild = BusinessChild::where('name',$loginData['phone'])->first();
+
+                if(!empty($isChild)){
+                    // 是子账号
+                    $isUser = json_decode('{}');
+                    $isUser->id = $isChild->p_id;
+                    $isUser->password = $isChild->password;
+                    $isUser->is_tui = 0;
+                }
+            }
         }
 
         if(empty($isUser)){
@@ -301,42 +316,26 @@ class RegisterController extends Controller {
     public function demo(){
         // 删除 B端用户
         $phone = [
-            '15888365810',
             '15888365811',
-            '15888365812',
-            '15888365813',
-            '15888365814',
-            '15888365815',
-            '15888365816',
-            '15888365817',
-            '15106910293',
             '13858126467',
             '13875478027',
             '13586026619',
             '15167475762',
             '15662628404',
-            '13646716305',
-            '18267316220',
-            '15106910293',
-            '15257139595',
-            '18329030539',
-            '18996544972',
-            '18896790035',
-            '15669904549',
-            '18605599894',
-            '15106910292',
-            '15056684223',
-            '15662628404',
-            '13605806988',
-            '18888888888',
-            '13955954701',
-            '18868188244',
-            '13858126466',
         ];
-        $id= BusinessUser::whereIn('phone',$phone)->pluck('id');
+
+        $id= User::pluck('id');
 
         // 查到对应的产品
-        $pid = Product::whereIn('business_id',$id)->get()->toArray();
-        dd($pid);
+//        $pid = Product::whereNotIn('business_id',$id)->pluck('id');
+
+        // 查到对应的订单
+        $order = UserApply::whereNotIn('user_id',$id)->where('order_type',0)->pluck('order_id');
+        // 查到对应的银联截图
+        $yinlian = DB::table('yinlian')->whereIn('order_id',$order)->pluck('id');
+
+        // 开始删除
+//        $s = UserApply::whereNotIn('user_id',$id)->where('order_type',0)->delete();
+//        dd($s);
     }
 }

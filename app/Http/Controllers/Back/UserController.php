@@ -12,6 +12,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends Controller
@@ -108,5 +109,33 @@ class UserController extends Controller
     public function demo(){
         $data = User::inRandomOrder()->first();
         dd($data);
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     * author hongwenyang
+     * method description : 保存用户数据
+     */
+    public function save(Request $request){
+        $post = $request->except(['s']);
+        $map['id'] = $post['id'];
+        unset($post['id']);
+        $s = BusinessUser::where($map)->update($post);
+        return returnStatus($s);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * author hongwenyang
+     * method description : 处理图片
+     */
+    public function savePic(Request $request){
+        $data = $request->except(['s']);
+        if(is_file($data['file']) ){
+            $img = '/uploads/'.Storage::disk('fcz')->put('fcz', $data['file']);
+        }
+        return response()->json(['data'=>$img]);
     }
 }

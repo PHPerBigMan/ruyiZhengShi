@@ -14,7 +14,7 @@
                         {{--<a class="" @click="change(2)" id="2">账户余额</a>--}}
                     </li>
                     <li class="layui-nav-item layui-nav-itemed">
-                        {{--<a class="" @click="change(3)" id="3">子账号管理</a>--}}
+                        <a class="" href="ChildList">子账号管理</a>
                     </li>
                 </ul>
             </div>

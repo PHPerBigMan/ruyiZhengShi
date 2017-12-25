@@ -125,7 +125,7 @@
                 add:function () {
                     var secondId = app.secondId;
                     console.log(secondId);
-                    layer_show('添加','/business/productRead/0/1/'+secondId,'880','660',1)
+                    layer_show('添加','/business/productRead/0/1/'+secondId,'880','660',3,app.secondId)
                 },
                 edit:function () {
                     var product_id = ID();
@@ -150,11 +150,13 @@
                         }else{
                             $.post('/business/productDel',{id:product_id},function (obj) {
                                 layer.msg(obj.msg);
-                                setTimeout(function () {
-                                    location.reload();
-                                },1000)
+                                $.post('/business/productList',{cat_id:app.secondId},function (data) {
+                                    app.tableData = data;
+                                    tableData()
+                                });
                             });
                         }
+                    },function () {
                     });
                 },
                 shelves:function (is_show) {

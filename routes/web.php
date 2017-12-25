@@ -59,10 +59,14 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin','use
     Route::get('/demo','UserController@demo');
     Route::get('user/detail/{id}', 'UserController@show')->name('user.detail');
     Route::get('company/detail/{id}', 'UserController@showCompany')->name('company.detail');
+    Route::post('saveUserInfo', 'UserController@save');
+    Route::any('savePic', 'UserController@savePic');
 
     Route::post('/user/changeStatus','UserController@changeStatus');
     Route::get('/order/{type}','OrderController@orderList');
     Route::post('/order/orderChange','OrderController@orderChange');
+    Route::post('/order/orderCancel','OrderController@orderCancel');
+    Route::any('/order/checkOrderStatus','OrderController@checkOrderStatus');
     Route::get('/setting','SettingController@SettingList');
     Route::get('/setting/serve','SettingController@Serve');
     Route::post('/setting/edit','SettingController@edit');
@@ -79,6 +83,9 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin','use
     Route::get('/todayTotal', 'DataTotalController@CatTodayTotal');
     Route::get('/typeChoose', 'DataTotalController@TotalType');
     Route::get('/areaList', 'DataTotalController@AreaList');
+    Route::get('/article', 'ArticleController@index');
+    Route::get('/ArticleEdit', 'ArticleController@edit');
+    Route::post('/saveArticle', 'ArticleController@save');
 
 });
 
@@ -123,8 +130,9 @@ Route::group(['prefix'=>'business','namespace'=>'Business','middleware'=>'Busine
     Route::post('/isSave','AdminController@isSave');
     Route::post('/adminImg','AdminController@adminImg');
     Route::post('/PayList','AdminController@PayList');
-    Route::post('/ChildList','AdminController@ChildList');
-    Route::post('/ChildSave','AdminController@ChildSave');
+    Route::get('/ChildList','AdminController@ChildList');
+    Route::post('/add','AdminController@ChildSave');
+    Route::post('/edit','AdminController@ChildEdit');
     Route::post('/ChildDel','AdminController@ChildDel');
     Route::get('/ChildShow/{id?}','AdminController@ChildShow');
     Route::post('/ChildDel','AdminController@ChildDel');

@@ -231,7 +231,14 @@ class ApplyController extends Controller {
 
     public function ReutrnOrderInform(Request $request){
         $Order = $request->except(['s']);
-
+        $ss= new Logs();
+        $ss->logs("支付页面订单详情",$Order);
+        // 获取订单类型
+        $orderType = UserApply::where('order_id',$Order['order_id'])->value('order_type');
+        if($orderType){
+            //B端用户申请订单
+            $Order['applicantType'] = 1;
+        }
         $orderData = DB::table('user_apply')
                         ->join('product','product.id','=','user_apply.product_id')
                         ->join('product_cat','product_cat.id','=','product.cat_id')
@@ -244,6 +251,7 @@ class ApplyController extends Controller {
                         ])->first();
 //        dd($Order['order_id']);
         //获取用户下单时的数据
+//        dd($orderData);
         $orderForm = OrderApplyForm::where('order_id',$Order['order_id'])->first();
         $need_data = json_decode($orderForm->need_data,true);
         $content1   = json_decode($orderForm->data,true);
@@ -339,13 +347,15 @@ class ApplyController extends Controller {
     public function YinlianPay(Request $request){
         $OrderId = $request->except(['s']);
         //处理上传凭证图片
-
+        $ss = new Logs();
+        $ss->logs("重新支付",$OrderId);
         $save = $request->file('imgs');
         foreach($save as $k=>$v){
             $imgs[$k] = '/uploads/'.$v->store('img','img');
         }
-
-
+        $Icon = $OrderId['Icon'];
+        $ss = new Logs();
+        $ss->logs("线下支付",$OrderId);
         unset($OrderId['imgs']);
         unset($OrderId['Icon']);
         $OrderId['img'] = json_encode($imgs);
@@ -357,8 +367,7 @@ class ApplyController extends Controller {
             $update['b_apply_status'] = 3;
         }
 //        unset($OrderId['type']);
-        //保存数据
-        $s = DB::table('yinlian')->insert($OrderId);
+
 
         // 记录b端服务费
         $orderCount = DB::table('user_apply')->where('order_id',$OrderId['order_id'])->value('order_count');
@@ -368,10 +377,22 @@ class ApplyController extends Controller {
 //        ])->value('rate');
         $serverMoney        = $orderCount * $rate * 10000;
         //是否使用金币抵扣服务费
-        $Icon = UserApply::where('order_id',$OrderId['order_id'])->value('isIcon');
         if($Icon){
             $serverMoney = $serverMoney - $Icon;
-            $update['isIcon'] = $Icon;
+
+            // 查看订单类型
+            $orderType = UserApply::where('order_id',$OrderId['order_id'])->value('order_type');
+            if($orderType){
+                if(!$OrderId['type']){
+                    // 此时B端作为C端使用
+                    $OrderId['type'] = 2;
+                }
+            }
+            // TODO:: 因为现在所有上传截图的用户 type = 0 所以判断一下是否C端已支付 如果C端已支付则此时的 type=0 用户为B端用户
+            $c_apply_status = UserApply::where('order_id',$OrderId['order_id'])->value('c_apply_status');
+            if($c_apply_status == 4){
+                $OrderId['type'] = 1;
+            }
             // 获取用户id
             if(!$OrderId['type']){
                 $user_id = UserApply::where('order_id',$OrderId['order_id'])->value('user_id');
@@ -381,11 +402,19 @@ class ApplyController extends Controller {
                 $user_type = 0;
                 $type = 5;
                 $integraling = User::where('id',$user_id)->value('integral');
+                $update['isIcon'] = $Icon;
             }else{
-                $user_id = Product::where('id',UserApply::where('order_id',$OrderId['order_id'])->value('product_id'))->value('business_id');
-                // 修改 business_user 表中的用户金币
+                if($OrderId['type'] == 2){
+                    $user_id = UserApply::where('order_id',$OrderId['order_id'])->value('user_id');
+                    $user_type = 1;
+                    $update['isIcon'] = $Icon;
+                }else{
+                    $user_id = Product::where('id',UserApply::where('order_id',$OrderId['order_id'])->value('product_id'))->value('business_id');
+                    // 修改 business_user 表中的用户金币
+                    $user_type = 1;
+                    $update['BIsIcon'] = $Icon;
+                }
                 DB::table('business_user')->where('id',$user_id)->decrement('integral',$Icon);
-                $user_type = 1;
                 $type = 5;
                 $integraling = BusinessUser::where('id',$user_id)->value('integral');
             }
@@ -398,6 +427,12 @@ class ApplyController extends Controller {
                 'user_type'=>$user_type
             ]);
         }
+        // TODO:: B端作为C端用户支付时,因为传递的 type=0 ，无法区分B端或者C端，所以代码在上半部分将 type 改为2 当将数据保存在银联支付时修改type=1
+        if($OrderId['type'] == 2){
+            $OrderId['type'] = 1;
+        }
+        //保存数据
+        $s = DB::table('yinlian')->insert($OrderId);
         if($OrderId['type'] == 0){
             // C端服务费
             $update['c_serve'] = $serverMoney;

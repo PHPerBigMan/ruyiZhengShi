@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
 use App\Model\Order;
+use App\Model\UserApply;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -60,7 +61,7 @@ class OrderController extends Controller
         }else if($type == 4){
             // 所有订单
             $title = "orderAll";
-            $whereIn = [0,1,2,3,4,5,6,7,8,9];
+            $whereIn = [0,1,2,3,4,5,6,7,8,9,10];
         }else if($type == 5){
             //C端用户取消订单
             $title = "ordercancel";
@@ -137,6 +138,11 @@ class OrderController extends Controller
 
     public function orderChange(Request $request){
         $data = $request->except(['s']);
+        $isUse = 0;
+        $UserBackMethod = 0;
+        // TODO:: 取消订单退还金币
+        // 获取订单的类型
+        $orderType = UserApply::where('id',$data['id'])->select('order_type','IsIcon','BIsIcon','user_id','product_id')->first();
         if($data['apply_type'] == 0){
             //修改C端用户支付状态
             if($data['type'] == 1){
@@ -145,6 +151,21 @@ class OrderController extends Controller
             }else if($data['type'] == 0){
                 //未通过
                 $status = 9;
+                // 查询订单C端支付时是否使用金币
+                if($orderType->order_type){
+                    // 共享订单 此时的C端用户为B端用户
+                    if($orderType->IsIcon){
+                        // 使用了金币
+                        $isUse = 1;
+                    }
+                }else{
+                    // 此时为普通订单
+                    if($orderType->IsIcon){
+                        // 使用了金币
+                        $isUse = 2;
+                    }
+                }
+                $UserBackMethod = 1;
             }else if($data['type'] == 2){
                 //退款成功
                 $status = 5;
@@ -155,9 +176,6 @@ class OrderController extends Controller
             $update = [
                 'c_apply_status'=>$status
             ];
-            $s = DB::table('user_apply')->where([
-                'id'=>$data['id']
-            ])->update($update);
         }else{
             //修改B端用户支付状态
             if($data['type'] == 1){
@@ -168,20 +186,66 @@ class OrderController extends Controller
                 //未通过
                 $status = 9;
                 $cstatus = 4;
+                // 驳回B端的支付 同时退还B,C两端 的金币
+                if($orderType->order_type){
+                    // 共享订单 此时的C端用户为B端用户
+                    if($orderType->IsIcon){
+                        // 使用了金币
+                        $isUse = 1;
+                    }
+                }else{
+                    // 此时为普通订单
+                    if($orderType->IsIcon){
+                        // 使用了金币
+                        $isUse = 2;
+                    }
+                }
+
+                $UserBackMethod = 1;
             }
             $update = [
                 'b_apply_status'=>$status,
                 'c_apply_status'=>$cstatus
             ];
-            $s = DB::table('user_apply')->where([
-                'id'=>$data['id']
-            ])->update($update);
         }
+        $s = DB::table('user_apply')->where([
+            'id'=>$data['id']
+        ])->update($update);
 
+        /**
+         * 支付审核不通过 退款用户抵扣的金币
+         */
+        if($UserBackMethod){
+            UserApply::BackIcon($isUse,$orderType,$data['id']);
+        }
 
         $retStatus = returnStatus($s);
 
         return response()->json($retStatus);
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * 取消订单
+     */
+    public function orderCancel(Request $request){
+        $id = $request->input('id');
+        $s =  UserApply::where('id',$id)->update([
+            'c_apply_status'=> 10,
+        ]);
+        return returnStatus($s);
+    }
+
+    public function checkOrderStatus(Request $request){
+        $id = $request->input('id');
+        $isPay  = UserApply::where('id',$id)->value('c_apply_status');
+        $status = [3,4,7,8];
+        if(in_array($isPay,$status)){
+            $code = 403;
+        }else{
+            $code = 200;
+        }
+        return response()->json(['code'=>$code]);
+    }
 }

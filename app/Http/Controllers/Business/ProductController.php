@@ -168,7 +168,7 @@ class ProductController extends Controller
             'diqu'=>$diqu
 
         ];
-//       dd($j);
+//        dd($ProductData);
         $view = 'Business.product.productRead_'.$cat_id;
 
         return view($view,$j);
@@ -213,13 +213,13 @@ class ProductController extends Controller
 
         $data['other_need'] = $data['other_need_1'].','.$data['other_need_2'].','.$data['other_need_4'].','.$data['other_need_4'];
 
-        if($data['cat_id'] == 20){
-            if($data['life']){
-                $data['life'] = $data['life_content'];
-            }else{
-                $data['life'] = "";
-            }
-        }
+//        if($data['cat_id'] == 20){
+//            if($data['life']){
+//                $data['life'] = $data['life_content'];
+//            }else{
+//                $data['life'] = "";
+//            }
+//        }
 
         if($data['other']){
             $data['other'] = $data['other_content'];
@@ -227,13 +227,11 @@ class ProductController extends Controller
             $data['other'] = "";
         }
 
-        if($data['cat_id'] != 20){
-            if(isset($data['years'])){
-                $data['years'] = $data['year_content'];
-            }else{
-                $data['years'] = "";
-            }
-        }
+//        if(isset($data['years'])){
+//            $data['years'] = $data['year_content'];
+//        }else{
+//            $data['years'] = "";
+//        }
 
         $need_title = [
             'pNumber',

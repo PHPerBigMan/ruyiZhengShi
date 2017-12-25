@@ -118,6 +118,17 @@
           </li>
             <?php
             $title = [
+                'article'
+            ];
+            ?>
+          <li class="layui-nav-item <?php if(in_array($Pagetitle,$title)){echo 'layui-nav-itemed';}?>">
+            <a class="" href="javascript:;">消息列表</a>
+            <dl class="layui-nav-child">
+              <dd class="<?php if($Pagetitle == 'article'){echo 'layui-this';}?>"><a href="/back/article">编辑文本</a></dd>
+            </dl>
+          </li>
+            <?php
+            $title = [
                 'admin',
             ];
             ?>

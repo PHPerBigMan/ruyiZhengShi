@@ -476,7 +476,7 @@ function OrderRead($product_id,$user_id,$order_id){
     $ProductData->content->other_need       = $data->product_cycle;
     $ProductData->content->other            = $productData->other;
     $ProductData->content->is_home          = $productData->is_home;
-    $ProductData->content->property_cut     = $needData->discount;
+    $ProductData->content->property_cut     = isset($needData->discount) ? $needData->discount : "";
     //这里  用户的 lending_cycle  为B端用户上传产品时的 audit_time
     $ProductData->content->audit_time       = $needData->lending_cycle;
     $ProductData->content->remark           = "";

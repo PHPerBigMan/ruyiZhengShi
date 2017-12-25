@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Business;
 
 use App\Http\Controllers\Controller;
+use App\Model\BusinessChild;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -142,42 +143,14 @@ class AdminController extends Controller
      */
 
     public function ChildList(){
-        $ChildData = DB::table('business_child')->where(['p_id'=>session('business_admin')])->get();
+       $data = BusinessChild::where('p_id',session('business_admin'))->get();
 
-        foreach($ChildData as $k=>$v){
-            $ChildData[$k]->method = DB::table('method_list')->whereIn('id',explode(',',$v->method))->select('desc')->get();
-            foreach($ChildData[$k]->method as $k1=>$v1){
-                $Method[$k1] = $v1->desc;
-            }
-            $ChildData[$k]->method = implode(',',$Method);
-        }
-        return response()->json($ChildData);
+       $title = "子账号";
+
+       return view('Business.admin.child',compact('data','title'));
     }
 
 
-    /**
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * author hongwenyang
-     * method description : 新增、编辑子账号页面
-     */
-
-    public function ChildShow($id){
-        if($id == 0){
-            $retData = [];
-        }else{
-            $retData = DB::table('business_child')->where(['id'=>$id])->first();
-            $retData->method = explode(',',$retData->method);
-        }
-        $MethodData = DB::table('method_list')->get();
-
-        $j = [
-            'data'   =>$retData,
-            'method' =>$MethodData,
-            'id'     =>$id
-        ];
-        return view('Business.admin.childAdd',$j);
-    }
 
     /**
      * @param Request $request
@@ -187,35 +160,32 @@ class AdminController extends Controller
      */
 
     public function ChildSave(Request $request){
-        $SaveData = $request->except(['s']);
-        $SaveData['method'] = $SaveData['method_id'];
-        unset($SaveData['method_id']);
-        $map['id'] = $SaveData['id'];
-        unset($SaveData['id']);
-        $SaveData['p_id'] = session('business_admin');
-        if($map['id'] == 0){
-            $is_Have = DB::table('business_child')->where(['p_id'=>$SaveData['p_id'],'name'=>$SaveData['name']])->get();
-            if($is_Have){
-                $retJson['code'] = 403;
-                $retJson['msg']  = '子账号已存在';
-                return response()->json($retJson);
-            }else if(count($is_Have) > 3){
-                $retJson['code'] = 404;
-                $retJson['msg']  = "您的子账户数量超过上限";
-            }else{
-                $s = DB::table('business_child')->insert($SaveData);
-            }
-        }else{
+        $data = $request->except(['s']);
 
-            $s = DB::table('business_child')->where($map)->update($SaveData);
-        }
-        if($s){
-            $retJson['code'] = 200;
-            $retJson['msg']  = "操作成功";
-        }
-        return response()->json($retJson);
+        $s = BusinessChild::addChild($data,session('business_admin'));
+
+        return $s;
     }
 
+
+    /**
+     * @param Request $request
+     * @return mixed
+     * author hongwenyang
+     * method description : 修改子账号
+     */
+    public function ChildEdit(Request $request){
+        $data = $request->except(['s']);
+
+        $s=  BusinessChild::where([
+            'id'=>$data['id']
+        ])->update([
+            'name'=>$data['name'],
+            'password'=>sha1($data['password'])
+        ]);
+
+        return returnStatus($s);
+    }
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse

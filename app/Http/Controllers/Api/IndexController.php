@@ -99,7 +99,8 @@ class IndexController extends Controller {
 
         $article = $request->input('article_type');
 
-
+//            $ss = new Logs();
+//            $ss->logs('获取服务协议',$a);
         if(!isset($a) || $a == 0){
             if(isset($article) && $article == 1){
                 $type = [0];
@@ -112,7 +113,10 @@ class IndexController extends Controller {
             if(isset($article) && $article == 1){
                 $type = [0];
             }else{
-                $type = [12];
+                $type = [$a];
+                if($a == 1){
+                    $type = [12];
+                }
             }
 
         }

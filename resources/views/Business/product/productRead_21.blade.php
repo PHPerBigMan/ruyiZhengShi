@@ -168,7 +168,7 @@
                 </div>
                 <div class="layui-input-inline" style="width: 300px;">
 
-                    <input type="text" name="year_content" placeholder="如果有产权年限请填写" autocomplete="off" class="layui-input" value="{{ empty($product['life']) ? $product['years'] : $product['life']}}">
+                    <input type="text" name="year_content" placeholder="如果有产权年限请填写" autocomplete="off" class="layui-input" value="{{ empty($product['years']) ? $product['years'] : $product['years']}}">
                 </div>
             </div>
             <div class="layui-form-item">

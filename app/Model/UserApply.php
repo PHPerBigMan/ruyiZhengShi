@@ -45,4 +45,23 @@ class UserApply extends Model
 
         return $data;
     }
+
+    public static function BackIcon($type,$orderType,$id){
+        // 进行退还金币操作
+        if($type == 1){
+            // 退还B端用户金币
+            if($orderType->IsIcon){
+                BusinessUser::where('id',$orderType->user_id)->increment('integral',$orderType->IsIcon);
+            }
+        }else{
+            if($orderType->IsIcon){
+                User::where('id',$orderType->user_id)->increment('integral',$orderType->IsIcon);
+            }
+        }
+
+        // 退款B端 产品方的金币
+        if($orderType->BIsIcon){
+            BusinessUser::where('id',Product::where('id',$orderType->product_id)->value('business_id'))->increment('integral',$orderType->BIsIcon);
+        }
+    }
 }

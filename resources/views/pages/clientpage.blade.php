@@ -12,7 +12,7 @@
 @section('js')
     <script>
         $('.dowloadOne').click(function () {
-            location.href = "https://www.pgyer.com/yJRp";
+            location.href = "https://www.pgyer.com/yJRp?from=singlemessage&isappinstalled=0";
         });
 
         $('.dowloadTow').click(function () {

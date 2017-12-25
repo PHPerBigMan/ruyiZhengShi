@@ -4,19 +4,19 @@
         <div class="layui-form-item">
             <label class="layui-form-label">姓名:</label>
             <div class="layui-input-block">
-                <input type="text" name="name"  autocomplete="off" placeholder="请输入标题" class="layui-input" value="{{ $data->name }}">
+                <input type="text" name="name"  autocomplete="off" placeholder="请输入标题" class="layui-input" value="{{ $data->name }}" lay-verify="title">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">手机:</label>
             <div class="layui-input-block">
-                <input type="text" name="user_phone"  placeholder="请输入" autocomplete="off" class="layui-input" value="{{ $data->user_phone }}">
+                <input type="text" name="user_phone"  placeholder="请输入" autocomplete="off" class="layui-input" value="{{ $data->user_phone }}" lay-verify="title">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">身份证号:</label>
             <div class="layui-input-block">
-                <input type="text" name="user_no"  placeholder="请输入" autocomplete="off" class="layui-input" value="{{ $data->user_no }}">
+                <input type="text" name="user_no"  placeholder="请输入" autocomplete="off" class="layui-input" value="{{ $data->user_no }}" >
             </div>
         </div>
         <div class="layui-form-item layui-form-text">
@@ -30,7 +30,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">逾期金额:</label>
             <div class="layui-input-block">
-                <input type="text" name="money"  placeholder="请输入" autocomplete="off" class="layui-input" value="{{ $data->money }}">
+                <input type="text" name="money"  placeholder="请输入" autocomplete="off" class="layui-input" value="{{ $data->money }}" lay-verify="title">
             </div>
         </div>
         <div class="layui-upload" id="layui-upload-black">
@@ -95,7 +95,13 @@
         layui.use(['form', 'layedit', 'laydate'], function(){
             var form = layui.form
                 ,layer = layui.layer
-
+            form.verify({
+                title: function(value){
+                    if(value.length < 5){
+                        return '不能为空';
+                    }
+                }
+            });
             //监听提交
             form.on('submit(go)', function(data){
                 $.post('/business/blackSave',$('#black-form').serialize(),function (obj) {
@@ -109,5 +115,7 @@
             });
 
         });
+
+
     </script>
     @endsection

@@ -52,7 +52,7 @@
                     <th>退款状态</th>
                     <th>操作</th>
                     @endif
-                    @if($type < 4)
+                    @if($type <= 4)
                         <th>操作</th>
                     @endif
 
@@ -72,8 +72,10 @@
                     <td>{{ $value->cat_name }}</td>
                     @if($type ==4)
                     <td class="red-font">
-                        @if($value->c_apply_status == 0 || $value->c_apply_status == 1 || $value->c_apply_status == 2 || $value->c_apply_status == 3 || $value->c_apply_status == 4)
+                        @if($value->c_apply_status == 0 || $value->c_apply_status == 1  || $value->c_apply_status == 3 || $value->c_apply_status == 4)
                             未完成
+                            @elseif($value->c_apply_status == 2)
+                            客户端用户已取消
                             @elseif($value->c_apply_status == 5)
                             退款中
                             @elseif($value->c_apply_status == 6)
@@ -84,22 +86,27 @@
                             放款成功
                             @elseif($value->c_apply_status == 9)
                             C端支付驳回
+                            @elseif($value->c_apply_status == 10 )
+                            总后台取消订单
                             @endif
                     </td>
                     @endif
                     <td>
-                        @if($type == 0 || $type ==1)
-                        <img src="{{ $value->img }}" alt="" class="img">
+                        @if($type == 0 || $type ==1 || $type == 4)
+                        <img src="{{ !empty($value->img) ? $value->img :'' }}" alt="" class="img">
                             @endif
                     </td>
                     <td>{{ date("Y-m-d H:i:s",$value->create_time) }}</td>
 
-                    @if($type < 4)
+                    @if($type <= 4)
                     <td>
                         {{--<button class="layui-btn layui-btn-small" onclick="read({{ $value->id }})">查看详情</button>--}}
 
                         <button class="layui-btn layui-btn-small" onclick="is_pass({{ $value->id }},1,{{ $type }},{{ $value->order_id }})">通过审核</button>
                         <button class="layui-btn layui-btn-small layui-btn-danger" onclick="is_pass({{ $value->id }},0,{{ $type }},{{ $value->order_id }})">审核不通过</button>
+                        @if($type == 4)
+                            <button class="layui-btn layui-btn-small  layui-btn-danger" onclick="cancel({{ $value->id }})">取消订单</button>
+                        @endif
                     </td>
                     @endif
                     @if($type == 7)
@@ -200,6 +207,41 @@
             // 时间
             var time = $('#test10').val();
             location.href = "/back/excel?type={{ $type }}&exl=order&selectType={{ $searchType }}&keyword="+keyword+"&time="+time;
+        }
+
+        function cancel(id) {
+            layer.confirm('确认取消该订单？', {
+                btn: ['确定','取消'] //按钮
+            }, function(){
+                $.post('checkOrderStatus',{id:id},function (obj1) {
+                    if(obj1.code == 403){
+                       layer.confirm('该订单用户端已支付，确认取消？',{
+                           btn:['确定','取消']
+                       },function () {
+                           doIt(id);
+                       },function () {
+                           layer.msg('取消成功');
+                       });
+                    }else{
+                        doIt(id);
+                    }
+                });
+
+            });
+        }
+
+        function doIt(id) {
+            $.post('orderCancel',{id:id},function (obj) {
+                layer.closeAll();
+                if(obj.code == 200){
+                    layer.msg(obj.msg,{type:1});
+                    setTimeout(function () {
+                        location.reload()
+                    },1000);
+                }else{
+                    layer.msg(obj.msg,{type:2});
+                }
+            })
         }
     </script>
 @endsection

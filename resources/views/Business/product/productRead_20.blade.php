@@ -8,79 +8,6 @@
                     <input type="text" name="pNumber"  autocomplete="off" class="layui-input" value="<?php echo empty($product['pNumber']) ? $pNumber : $product['pNumber'];?>" placeholder="随机产品编号" readonly>
                 </div>
             </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">收费标准 :</label>
-                <div class="layui-input-block">
-                    <div class="layui-input-inline" style="width: 100px;">
-                        <input type="text" name="other_need_1" placeholder="￥服务费" autocomplete="off" class="layui-input">
-                    </div>
-                    <div class="layui-form-mid">-</div>
-                    <div class="layui-input-inline" style="width: 100px;">
-                        <input type="text" name="other_need_2" placeholder="￥调查费" autocomplete="off" class="layui-input">
-                    </div>
-                    <div class="layui-input-inline" style="width: 100px;">
-                        <input type="text" name="other_need_3" placeholder="￥其他费用" autocomplete="off" class="layui-input">
-                    </div>
-                    <div class="layui-form-mid">-</div>
-                    <div class="layui-input-inline" style="width: 100px;">
-                        <input type="text" name="other_need_4" placeholder="￥保证金" autocomplete="off" class="layui-input">
-                    </div>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">利息 :</label>
-                <div class="layui-input-block">
-                    <input type="number" name="accrual"  autocomplete="off" class="layui-input" value="{{ $product['accrual'] }}" placeholder="请填写数字" required>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">可借款周期 :</label>
-                <div class="layui-input-block">
-                    <select name="product_cycle">
-                        <?php $title = empty($list[0]) ? ['3','6','9','12','18']: $list[0]['product_cycle'];?>
-                        @foreach($title as $v)
-                            <option value="{{ $v }}" @if($v === $product['product_cycle']) selected="" @endif>{{ $v }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">额度 :</label>
-                <div class="layui-input-block">
-                    <select name="money">
-                        <?php $title = empty($list[0]) ? ['0-30','30-50','50-70','100以上'] : $list[0]['money'];?>
-                        @foreach($title as $v)
-                            <option value="{{ $v }}" @if($v === $product['money']) selected="" @endif>{{ $v }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">还款方式 :</label>
-                <div class="layui-input-block">
-                    <select name="lending_type">
-                        <?php $title = empty($list[0]) ? ['先息后本','先本后息','等额本息'] : $list[0]['lending_type'];?>
-                        @foreach($title as $v)
-                            <option value="{{ $v }}" @if($v === $product['lending_type']) selected="" @endif>{{ $v }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">审核周期 :</label>
-                <div class="layui-input-block">
-                    <input type="text" name="audit_time"  autocomplete="off" class="layui-input" value="{{ $product['audit_time'] }}" placeholder="单位（天）" required>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">估值率 :</label>
-                <div class="layui-input-block">
-                    <input type="text" name="property_cut"  autocomplete="off" class="layui-input" value="{{ $product['property_cut'] }}">
-                </div>
-            </div>
-
             @if($cat_id != 41 && !empty($list[0]))
                 <div class="layui-form-item">
                     <label class="layui-form-label">房产类型 :</label>
@@ -136,7 +63,6 @@
                     </select>
                 </div>
             </div>
-
             <div class="layui-form-item">
                 <label class="layui-form-label">是否上门 :</label>
                 <div class="layui-input-block">
@@ -146,6 +72,26 @@
                             <option value="{{ $v }}" >{{ $v }}</option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">产权年限要求 :</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="years" value="1" title="有" <?php if(!empty($product['years'])){ echo "checked";}?>>
+                    <input type="radio" name="years" value="0" title="无" <?php if(empty($product['years'])){ echo "checked";}?>>
+                </div>
+                <div class="layui-input-inline" style="width: 300px;">
+                    <input type="text" name="life_content" placeholder="如果有产权年限请填写" autocomplete="off" class="layui-input" value="{{ $product['years'] }}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">其他要求 :</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="other" value="1" title="有" <?php if(!empty($product['other'])){ echo "checked";}?>>
+                    <input type="radio" name="other" value="0" title="无" <?php if(empty($product['other'])){ echo "checked";}?>>
+                </div>
+                <div class="layui-input-inline" style="width: 300px;">
+                    <input type="text" name="other_content" placeholder="如果有其他要求请填写" autocomplete="off" class="layui-input" value="{{ $product['other']}}">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -159,25 +105,75 @@
                     </select>
                 </div>
             </div>
-
             <div class="layui-form-item">
-                <label class="layui-form-label">产权年限要求 :</label>
+                <label class="layui-form-label">收费标准 :</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="life" value="1" title="有" <?php if(!empty($product['life'])){ echo "checked";}?>>
-                    <input type="radio" name="life" value="0" title="无" <?php if(empty($product['life'])){ echo "checked";}?>>
-                </div>
-                <div class="layui-input-inline" style="width: 300px;">
-                    <input type="text" name="life_content" placeholder="如果有产权年限请填写" autocomplete="off" class="layui-input" value="{{ $product['life'] }}">
+                    <div class="layui-input-inline" style="width: 100px;">
+                        <input type="text" name="other_need_1" placeholder="￥服务费" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid">-</div>
+                    <div class="layui-input-inline" style="width: 100px;">
+                        <input type="text" name="other_need_2" placeholder="￥调查费" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline" style="width: 100px;">
+                        <input type="text" name="other_need_3" placeholder="￥其他费用" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid">-</div>
+                    <div class="layui-input-inline" style="width: 100px;">
+                        <input type="text" name="other_need_4" placeholder="￥保证金" autocomplete="off" class="layui-input">
+                    </div>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">其他要求 :</label>
+                <label class="layui-form-label">利息 :</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="other" value="1" title="有" <?php if(!empty($product['other'])){ echo "checked";}?>>
-                    <input type="radio" name="other" value="0" title="无" <?php if(empty($product['other'])){ echo "checked";}?>>
+                    <input type="number" name="accrual"  autocomplete="off" class="layui-input" value="{{ $product['accrual'] }}" placeholder="请填写数字" required>
                 </div>
-                <div class="layui-input-inline" style="width: 300px;">
-                    <input type="text" name="other_content" placeholder="如果有其他要求请填写" autocomplete="off" class="layui-input" value="{{ $product['other']}}">
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">额度 :</label>
+                <div class="layui-input-block">
+                    <select name="money">
+                        <?php $title = empty($list[0]) ? ['0-30','30-50','50-70','100以上'] : $list[0]['money'];?>
+                        @foreach($title as $v)
+                            <option value="{{ $v }}" @if($v === $product['money']) selected="" @endif>{{ $v }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">可借款周期 :</label>
+                <div class="layui-input-block">
+                    <select name="product_cycle">
+                        <?php $title = empty($list[0]) ? ['3','6','9','12','18']: $list[0]['product_cycle'];?>
+                        @foreach($title as $v)
+                            <option value="{{ $v }}" @if($v === $product['product_cycle']) selected="" @endif>{{ $v }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">还款方式 :</label>
+                <div class="layui-input-block">
+                    <select name="lending_type">
+                        <?php $title = empty($list[0]) ? ['先息后本','先本后息','等额本息'] : $list[0]['lending_type'];?>
+                        @foreach($title as $v)
+                            <option value="{{ $v }}" @if($v === $product['lending_type']) selected="" @endif>{{ $v }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">审核周期 :</label>
+                <div class="layui-input-block">
+                    <input type="text" name="audit_time"  autocomplete="off" class="layui-input" value="{{ $product['audit_time'] }}" placeholder="单位（天）" required>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">估值率 :</label>
+                <div class="layui-input-block">
+                    <input type="text" name="property_cut"  autocomplete="off" class="layui-input" value="{{ $product['property_cut'] }}">
                 </div>
             </div>
             <div class="xieyi">

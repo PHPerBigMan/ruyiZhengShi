@@ -12,6 +12,7 @@ use App\Model\BusinessUser;
 use App\Model\Config;
 use App\Model\Logs;
 use App\Model\User;
+use App\Model\UserApply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mockery\Exception;
@@ -223,6 +224,8 @@ class UserController extends Controller {
 
     public function Atricle(Request $request){
         $Atricle = $request->except('s');
+        $ss = new Logs();
+        $ss->logs('服务协议',$Atricle);
         $data = DB::table('article')->where($Atricle)->first();
 
         $j = returnData($data);
@@ -242,13 +245,23 @@ class UserController extends Controller {
        $ChangeData = $request->except('s');
        $map['order_id']  = $ChangeData['order_id'];
        unset($ChangeData['order_id']);
-       $s = DB::table('user_apply')->where($map)->update($ChangeData);
-       if($s){
-           $retJson['code'] = 200;
-           $retJson['msg']  = '状态更改成功';
+       if($ChangeData['c_apply_status'] == 2){
+           // 取消订单查看订单是否超过 7天
+           $time = UserApply::where($map)->value('create_time');
+           if((time() - $time) >= 60*60*24*7){
+               // 超过7天的订单不能取消
+               $retJson['code'] = 404;
+               $retJson['msg']  = '订单时效超过7天不能取消';
+           }
        }else{
-           $retJson['code'] = 404;
-           $retJson['msg']  = '状态更改失败';
+           $s = DB::table('user_apply')->where($map)->update($ChangeData);
+           if($s){
+               $retJson['code'] = 200;
+               $retJson['msg']  = '状态更改成功';
+           }else{
+               $retJson['code'] = 404;
+               $retJson['msg']  = '状态更改失败';
+           }
        }
        return response()->json($retJson);
     }
