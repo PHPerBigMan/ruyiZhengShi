@@ -63,6 +63,7 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin','use
     Route::any('savePic', 'UserController@savePic');
 
     Route::post('/user/changeStatus','UserController@changeStatus');
+    Route::post('/user/addInt','UserController@addInt');
     Route::get('/order/{type}','OrderController@orderList');
     Route::post('/order/orderChange','OrderController@orderChange');
     Route::post('/order/orderCancel','OrderController@orderCancel');

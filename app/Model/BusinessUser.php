@@ -19,7 +19,7 @@ class BusinessUser extends Model{
         return date('YmdHis',strtotime($value));
     }
 
-
+    
     /**
      * @param $data
      * @return mixed

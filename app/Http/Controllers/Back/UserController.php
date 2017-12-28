@@ -25,7 +25,8 @@ class UserController extends Controller
 
     public function UserList($type){
         $keyword = "";
-
+        $where = [];
+        $whereBetween = [];
         if($type == 1){
             //C端用户
             $table = 'user';
@@ -37,6 +38,40 @@ class UserController extends Controller
             $title = 'userB';
             $view = "Bindex";
         }
+
+        if(!empty($_GET['keyword'])){
+            $keyword = $_GET['keyword'];
+            if($type == 1){
+                $where = [
+                    'phone'=>$keyword
+                ];
+            }else{
+                $where = [
+                    'companyName'=>$keyword
+                ];
+            }
+        }
+
+        if(isset($_GET['is_pass'])){
+            $is_pass = $_GET['is_pass'];
+            if($is_pass != "" && $is_pass != 3){
+
+                $pass = [
+                    'is_pass'=>$is_pass
+                ];
+                $where = array_merge($pass,$where);
+            }
+
+        }
+
+        if(isset($_GET['exTime'])){
+//            dd($_GET['exTime']);
+            $time = explode(' - ',$_GET['exTime']);
+            $whereBetween = [$time[0],$time[1]];
+        }else{
+            $whereBetween = ["1997-01-01","2999-12-31"];
+        }
+        // 查询用户状态
         if(!empty($_GET['keyword'])){
             $keyword = $_GET['keyword'];
             if($type == 1){
@@ -44,7 +79,7 @@ class UserController extends Controller
                     'user_name'=>$keyword
                 ])->orWhere([
                     'phone'=>$keyword
-                ])->orderBy('create_time','desc')->paginate(10);
+                ])->orderBy('create_time','desc')->whereBetween('create_time',$whereBetween)->paginate(10);
             }else{
                 $data = DB::table($table)->orWhere([
                     'companyName'=>$keyword
@@ -54,15 +89,18 @@ class UserController extends Controller
             }
 
         }else{
-            $data = DB::table($table)->orderBy('create_time','desc')->paginate(10);
+            $data = DB::table($table)->where($where)->whereBetween('create_time',$whereBetween)->orderBy('create_time','desc')->paginate(10);
         }
+
 
         $j = [
             'Pagetitle'=>$title,
             'data'=>$data,
-            'type'=>$type
+            'type'=>$type,
+            'is_pass'=> isset($_GET['is_pass']) ? $_GET['is_pass'] : 3,
+            'keyword'=>  isset($_GET['keyword']) ? $_GET['keyword'] : "",
+            'time'=> isset($_GET['exTime']) ? $_GET['exTime'] : ""
         ];
-
         return view('Back.user.'.$view,$j);
     }
 
@@ -137,5 +175,9 @@ class UserController extends Controller
             $img = '/uploads/'.Storage::disk('fcz')->put('fcz', $data['file']);
         }
         return response()->json(['data'=>$img]);
+    }
+
+    public function addInt(){
+
     }
 }

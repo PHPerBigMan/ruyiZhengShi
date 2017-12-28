@@ -98,16 +98,18 @@ class PayController extends Controller
            // 支付成功
            if($notify_data['info_order'] == 2){
                // B端支付 修改支付状态
-               UserApply::where('order_id',$notify_data['no_order'])->update([
+               $s = UserApply::where('order_id',$notify_data['no_order'])->update([
                    'b_apply_status'=>4
                ]);
            }else{
                // C端支付 修改支付状态
-               UserApply::where('order_id',$notify_data['no_order'])->update([
+              $s =  UserApply::where('order_id',$notify_data['no_order'])->update([
                    'c_apply_status'=>4
                ]);
            }
        }
+//        $s->logs("异步通知","");
+        die("{'ret_code':'0000','ret_msg':'交易成功'}");
     }
 
 

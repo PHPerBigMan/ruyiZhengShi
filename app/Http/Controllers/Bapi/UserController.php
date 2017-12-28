@@ -104,6 +104,10 @@ class UserController extends Controller
             $SaveData['is_pass'] = 2;
         }
 
+        // 如果传了身份证进行归属地查询
+        if(!empty($SaveData['idcard'])){
+            $SaveData['belonging'] = IdBelonging($SaveData['idcard']);
+        }
         $s = DB::table('business_user')->where($map)->update($SaveData);
 
         if($s){

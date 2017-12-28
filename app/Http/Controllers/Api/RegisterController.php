@@ -314,28 +314,13 @@ class RegisterController extends Controller {
     }
 
     public function demo(){
-        // 删除 B端用户
-        $phone = [
-            '15888365811',
-            '13858126467',
-            '13875478027',
-            '13586026619',
-            '15167475762',
-            '15662628404',
-        ];
-
-        $id= User::pluck('id');
-
-        // 查到对应的产品
-//        $pid = Product::whereNotIn('business_id',$id)->pluck('id');
-
-        // 查到对应的订单
-        $order = UserApply::whereNotIn('user_id',$id)->where('order_type',0)->pluck('order_id');
-        // 查到对应的银联截图
-        $yinlian = DB::table('yinlian')->whereIn('order_id',$order)->pluck('id');
-
-        // 开始删除
-//        $s = UserApply::whereNotIn('user_id',$id)->where('order_type',0)->delete();
-//        dd($s);
+        $data = BusinessUser::where('idcard','!=',' ')->pluck('id','idcard');
+        foreach ($data as $k=>$v){
+            $result[$v] = IdBelonging($k);
+//            $s = User::where('id',$v)->update([
+//                'belonging'=>$result
+//            ]);
+        }
+        dd($data);
     }
 }

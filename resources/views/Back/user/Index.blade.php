@@ -5,12 +5,19 @@
             <div class="layui-inline">
                 <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="用户名或手机号">
             </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">时间：</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="test10" placeholder=" - " style="width: 300px" name="exTime" value="{{ $time }}">
+                </div>
+            </div>
             <button class="layui-btn" data-type="reload">搜索</button>
         </form>
     </div>
     <div class="layui-form table-data">
         <table class="layui-table">
             <colgroup>
+                <col width="150">
                 <col width="150">
                 <col width="150">
                 <col width="150">
@@ -27,6 +34,7 @@
                 <th>用户名</th>
                 <th>手机号</th>
                 <th>注册时间</th>
+                <th>身份证归属地</th>
                 <th>推荐人ID</th>
                 <th>访问次数</th>
                 <th>操作</th>
@@ -42,22 +50,33 @@
                     <td id="{{ $value->id }}">{{ $value->user_name }}</td>
                     <td>{{ $value->phone }}</td>
                     <td>{{ $value->create_time }}</td>
+                    <td>{{ $value->belonging }}</td>
                     <td>{{ empty($value->tuiUserId) ? "非推荐" : $value->tuiUserId}}</td>
                     <td>{{ $value->view_count }}</td>
                     <td>
                         <a href="{{ route('user.detail', ['id' => $value->id]) }}" class="layui-btn layui-btn-small">查看用户信息</a>
+                        <p class="layui-btn layui-btn-small" onclick="add({{ $value->id }})">增加如易金币</p>
                     </td>
                 </tr>
             @endforeach
             </tbody>
         </table>
-        {{ $data->links() }}
+        {{ $data->appends(['exTime' => $time,'keyword' => $keyword])->links() }}
     </div>
 
 @endsection
 
 @section('js')
     <script>
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            //日期时间范围
+            laydate.render({
+                elem: '#test10'
+                ,type: 'datetime'
+                ,range: true
+            });
+        });
         /**
          * 修改分类
          * @param id
@@ -94,6 +113,19 @@
                         //删除对应的 tr
                     }
                     layer.msg(obj.msg,{icon:2})
+                });
+            });
+        }
+
+        function add(id) {
+            layer.prompt({title: '输入需要充值的金币数额', formType: 3}, function(count, index){
+                layer.close(index);
+                layer.confirm("确定要为该用户增加<span style='color: red'>"+count+"</span>金币", {
+                    btn: ['确定','取消'] //按钮
+                }, function(){
+                   $.post('addInt',{count:count,id:id,type:1},function (obj) {
+                       
+                   });
                 });
             });
         }

@@ -2,11 +2,24 @@
 @section('main')
     <div class="demoTable productCat">
         <form action="">
+            <select name="is_pass" id="select-type" class="order-select">
+                <option value="3" <?php if($is_pass == 3)echo "selected";?>>全部</option>
+                <option value="0" <?php if($is_pass == 0)echo "selected";?>>未通过</option>
+                <option value="1" <?php if($is_pass == 1)echo "selected";?>>已通过</option>
+                <option value="2" <?php if($is_pass == 2)echo "selected";?>>审核中</option>
+            </select>
             <div class="layui-inline">
                 <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="用户名或手机号">
             </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">时间：</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="test10" placeholder=" - " style="width: 300px" name="exTime" value="{{ $time }}">
+                </div>
+            </div>
             <button class="layui-btn" data-type="reload">搜索</button>
         </form>
+        <button  onclick="excel()" class="layui-btn">导出用户</button>
     </div>
     <div class="layui-form table-data">
         <table class="layui-table">
@@ -16,6 +29,7 @@
                 <col width="150">
                 <col width="80">
                 <col width="50">
+                <col width=80">
                 <col width=80">
                 <col width="200">
                 <col>
@@ -28,6 +42,7 @@
                 <th>企业法人</th>
                 <th>法人联系电话</th>
                 <th>是否通过审核</th>
+                <th>身份证归属地</th>
                 <th>注册时间</th>
                 <th>操作</th>
             </tr>
@@ -42,7 +57,16 @@
                     <td>{{ $value->companyCode }}</td>
                     <td>{{ $value->companyLegal }}</td>
                     <td>{{ $value->phone }}</td>
-                    <td id="{{ $value->id }}">{{ $value->is_pass == 0 ? "未通过" :$value->is_pass == 1 ? "已通过" : "审核中" }}</td>
+                    <td id="{{ $value->id }}">
+                        @if($value->is_pass == 0)
+                             未通过
+                            @elseif($value->is_pass == 1)
+                            已通过
+                            @elseif($value->is_pass == 2)
+                            审核中
+                            @endif
+                    </td>
+                    <td>{{ $value->belonging }}</td>
                     <td>{{ $value->create_time }}</td>
                     <td>
                         <a href="{{ route('company.detail', ['id' => $value->id]) }}" class="layui-btn layui-btn-small">查看用户信息</a>
@@ -54,15 +78,30 @@
                 @endforeach
             </tbody>
         </table>
-        {{ $data->links() }}
+        {{ $data->appends(['keyword' => $keyword,'is_pass'=>$is_pass,'exTime'=>$time])->links() }}
     </div>
 
 @endsection
 
 @section('js')
     <script>
-        function sCat(id) {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            //日期时间范围
+            laydate.render({
+                elem: '#test10'
+                ,type: 'datetime'
+                ,range: true
+            });
+        });
+        function excel() {
+            var select_type = $('#select-type option:selected').val();
+            // 关键词
+            var keyword = $('#demoReload').val();
 
+            var time = $('#test10').val();
+            location.href = "/back/excel?exl=userB&selectType="+select_type+"&keyword="+keyword+"&time="+time;
+//            location.href = "/back/excel?exl=userB";
         }
 
         /**

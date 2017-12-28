@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use App\Model\Order;
 use App\Model\UserApply;
+use App\Model\Yinlian;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -100,7 +101,7 @@ class OrderController extends Controller
                 $data = $this->model->BackOrder($_GET['keyword'],$where,$whereOr,$whereIn,$startTime,$endTime,$nextTime);
             }else{
                 $data = $this->model->BackOrder("",$where,$whereOr,$whereIn,$startTime,$endTime,$nextTime);
-//                dd($startTime);
+
             }
         }else{
             if(isset($_GET['keyword']) && $_GET['keyword'] != ""){
@@ -111,11 +112,17 @@ class OrderController extends Controller
             }
 
         }
+
+        if(!empty($data)){
+            $data = Yinlian::getPayImg($data);
+
+        }
         foreach($data as $k=>$v){
             $pNumber = json_decode($v->content);
             $v->pNumber = $pNumber->pNumber;
         }
-//        dd($type);
+
+
         $j = [
             'type'                  =>$type,
             'data'                  =>$data,

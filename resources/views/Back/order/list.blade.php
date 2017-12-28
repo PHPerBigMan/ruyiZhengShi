@@ -27,7 +27,7 @@
             <colgroup>
                 <col width="100">
                 <col width="150">
-                <col width="150">
+                <col width="100">
                 <col width="80">
                 <col width="150">
                 <col width=80">
@@ -46,7 +46,15 @@
                 @if($type ==4)
                     <th>订单状态</th>
                 @endif
-                <th>支付凭证</th>
+                @if($type != 8)
+                    <th>支付凭证</th>
+                @endif
+                @if($type == 8)
+                    <th>客户端支付凭证</th>
+                    <th>商户端支付凭证</th>
+                    <th>客户端服务费</th>
+                    <th>商户端服务费</th>
+                    @endif
                 <th>创建时间</th>
                 @if($type == 7)
                     <th>退款状态</th>
@@ -91,11 +99,27 @@
                             @endif
                     </td>
                     @endif
+                    @if($type != 8)
                     <td>
                         @if($type == 0 || $type ==1 || $type == 4)
                         <img src="{{ !empty($value->img) ? $value->img :'' }}" alt="" class="img">
                             @endif
                     </td>
+                    @endif
+                    @if($type == 8)
+                        <td>
+                            <img src="{{ !empty($value->CPayimg) ? $value->CPayimg[0] :'' }}" alt="" class="img">
+                        </td>
+                        <td>
+                            <img src="{{ !empty($value->BPayimg) ? $value->BPayimg[0] :'' }}" alt="" class="img">
+                        </td>
+                        <td>
+                            {{ $value->c_serve }}
+                        </td>
+                        <td>
+                            {{ $value->b_serve }}
+                        </td>
+                        @endif
                     <td>{{ date("Y-m-d H:i:s",$value->create_time) }}</td>
 
                     @if($type <= 4)

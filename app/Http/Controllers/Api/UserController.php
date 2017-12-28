@@ -62,6 +62,10 @@ class UserController extends Controller {
         $id = $SaveData['user_id'];
         unset($SaveData['user_id']);
 
+        // 如果传了身份证信息则进行查询
+        if(!empty($SaveData['user_idcard'])){
+            $SaveData['belonging'] = IdBelonging($SaveData['user_idcard']);
+        }
         $s = DB::table('user')->where(['id'=>$id])->update($SaveData);
 
         if($s){
@@ -100,7 +104,7 @@ class UserController extends Controller {
                 break;
             case 1:
                 $apply_status = [1,3,4,5];
-                $b_apply_status = [0,5];
+                $b_apply_status = [0,1,5];
                 break;
             case 2:
                 $apply_status = [4,5,6,7];

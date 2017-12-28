@@ -845,6 +845,25 @@ function QiNiu(){
 
 }
 
+/**
+ * @param $data
+ * @return string
+ * author hongwenyang
+ * method description : 身份证附属地查询
+ */
+function IdBelonging($data){
+    $belonging = "";
+    $key = config('app.IdBelonging');
+    $url = "http://apis.juhe.cn/idcard/index?key=".$key."&cardno=".$data;
+
+    $return = json_decode(file_get_contents($url));
+
+    if($return->resultcode == 200){
+        $belonging = $return->result->area;
+    }
+    return $belonging;
+}
+
 
 
 
