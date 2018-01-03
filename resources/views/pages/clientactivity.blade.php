@@ -4,6 +4,8 @@
     <div class="activity">
         <span class="top"></span>
         <div class="btn"></div>
+        <div class="text">《如易金服》移动金融智选平台 为小微企业和个人消费者提供专业的
+            贷款在线搜索，匹配，推荐和申请服务，意在“让金融变得更加简单和普惠”</div>
         <span class="mid">
             <span></span>
             <div class="midtext">

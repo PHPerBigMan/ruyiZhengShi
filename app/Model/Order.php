@@ -119,4 +119,28 @@ class Order extends Model
         ));
         return $data;
     }
+
+    public static function ReadMoreOrder($data){
+        $returnData = array();
+        // 基本信息
+        if($data->order_type){
+            // B端用户
+            $UserInfo = BusinessUser::where('id',$data->user_id)->first();
+            if(!empty($UserInfo)){
+                $returnData['name'] = $UserInfo->companyName;
+                $returnData['card_no'] = $UserInfo->idcard;
+                $returnData['phone'] = $UserInfo->phone;
+            }
+        }else{
+            // C端用户
+            $UserInfo = User::findOrFail($data->user_id);
+            if(!empty($UserInfo)){
+                $returnData['name'] = $UserInfo->user_name;
+                $returnData['card_no'] = $UserInfo->user_idcard;
+                $returnData['phone'] = $UserInfo->phone;
+            }
+        }
+
+        return $returnData;
+    }
 }

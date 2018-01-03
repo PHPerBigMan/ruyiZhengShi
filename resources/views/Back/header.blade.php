@@ -10,7 +10,7 @@
   {{--<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.csss">--}}
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <link rel="stylesheet" href="{{ URL::asset('css/AdminLTE.min.css') }}">
-  <link rel="stylesheet" href="{{ URL::asset('css/admin.css?v_7') }}">
+  <link rel="stylesheet" href="{{ URL::asset('css/admin.css?v_8') }}">
   <link rel="stylesheet" href="{{ URL::asset('dist/css/skins/_all-skins.min.css') }}">
   <link rel="stylesheet" href="{{ URL::asset('plugins/iCheck/flat/blue.css') }}">
   <link rel="stylesheet" href="{{ URL::asset('plugins/morris/morris.css') }}">

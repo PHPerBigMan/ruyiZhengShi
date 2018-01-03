@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
 use App\Model\BusinessUser;
+use App\Model\IntegralList;
 use App\Model\Product;
 use App\Model\User;
 use App\Model\UserApply;
@@ -64,7 +65,7 @@ class UserController extends Controller
 
         }
 
-        if(isset($_GET['exTime'])){
+        if(isset($_GET['exTime']) && !empty($_GET['exTime'])){
 //            dd($_GET['exTime']);
             $time = explode(' - ',$_GET['exTime']);
             $whereBetween = [$time[0],$time[1]];
@@ -177,7 +178,35 @@ class UserController extends Controller
         return response()->json(['data'=>$img]);
     }
 
-    public function addInt(){
+    public function addInt(Request $request){
+        $post = $request->except(['s']);
+        if($post['type'] == 1){
+            // 增加c端用户的金币 gold,integral 都要增加
+            User::where('id',$post['id'])->increment('integral',$post['count']);
+            User::where('id',$post['id'])->increment('gold',$post['count']);
 
+            $integraling = User::where('id',$post['id'])->value('integral');
+            $user_type = 0;
+        }else{
+
+            // 增加b端用户的金币 gold,integral 都要增加
+            BusinessUser::where('id',$post['id'])->increment('integral',$post['count']);
+            BusinessUser::where('id',$post['id'])->increment('gold',$post['count']);
+//           dd($s);
+            $integraling = BusinessUser::where('id',$post['id'])->value('integral');
+            $user_type = 1;
+        }
+        $s = 1;
+        // 增加金币操作列表
+        IntegralList::insert([
+            'user_id'=>$post['id'],
+            'integral'=>$post['count'],
+            'integraling'=>$integraling,
+            'type'=>7,
+            'user_type'=>$user_type,
+            'is_gold'=>2
+        ]);
+
+        return returnStatus($s);
     }
 }

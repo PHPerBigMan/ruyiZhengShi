@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Bapi;
 
+use App\Http\Controllers\PushController;
 use App\Model\ApplyBasic;
 use App\Model\BusinessUser;
 use App\Model\Logs;
@@ -18,9 +19,12 @@ use phpDocumentor\Reflection\DocBlock;
 class OrderController extends Controller
 {
     protected $model = "";
+    protected $push,$log;
     public function __construct()
     {
         $this->model = new ApplyBasic();
+        $this->push = new PushController();
+        $this->log = new Logs();
     }
 
     /**
@@ -188,6 +192,9 @@ class OrderController extends Controller
     public function OrderChange(Request $request){
         $Orderstatus = $request->except(['s']);
         $b_order_status = [1,2,5,6,7,8];
+        $orderType = UserApply::where([
+            'order_id'=>$Orderstatus['order_id']
+        ])->value('order_type');
         if(in_array($Orderstatus['b_apply_status'],$b_order_status)){
             switch ($Orderstatus['b_apply_status']){
                 case 1:
@@ -196,12 +203,22 @@ class OrderController extends Controller
                         'b_apply_status'=>1,
                         'reason'=>$Orderstatus['reason']
                     ];
+                    $message = "您的申请订单已被拒单，请进入app查看详情";
+                    if($orderType){
+                        // B端用户
+                        $message = "您的共享订单已被拒单，请进入app查看详情";
+                    }
                     break;
                 case 2:
                     $update = [
                         'c_apply_status'=>7,
                         'b_apply_status'=>2,
                     ];
+                    $message = "您的申请订单已被接单，请进入app查看详情";
+                    if($orderType){
+                        // B端用户
+                        $message = "您的共享订单已被接单，请进入app查看详情";
+                    }
                     break;
                 case 5:
                     $update = [
@@ -209,17 +226,32 @@ class OrderController extends Controller
                         'b_apply_status'=>5,
                         'reason'=>$Orderstatus['reason']
                     ];
+                    $message = "金融管家拒绝放款，请进入app查看详情";
+                    if($orderType){
+                        // B端用户
+                        $message = "【共享订单】金融管家拒绝放款，请进入app查看详情";
+                    }
                     break;
                 case 6:
                     $update = [
                         'c_apply_status'=>8,
                         'b_apply_status'=>6,
                     ];
+                    $message = "您的申请订单已放款，请进入app查看详情";
+                    if($orderType){
+                        // B端用户
+                        $message = "您的共享订单已放款，请进入app查看详情";
+                    }
                     break;
                 case 7:
                     $update = [
                         'b_apply_status'=>7,
                     ];
+                    $message = "您的申请订单已完成，请进入app中进行评价";
+                    if($orderType){
+                        // B端用户
+                        $message = "您的共享订单已完成，请进入app中进行评价";
+                    }
                     break;
                 default:
                     $update = [
@@ -227,15 +259,18 @@ class OrderController extends Controller
                         'c_apply_status'=>5,
                         'reason'=>$Orderstatus['reason']
                     ];
+                    $message = "金融管家取消了您的订单，请进入app查看详情";
+                    if($orderType){
+                        // B端用户
+                        $message = "金融管家取消了您的共享订单，请进入app查看详情";
+                    }
                     break;
             }
         }
+        //查询订单类型
+
         //如果订单完结 增加用户的50金币
         if($Orderstatus['b_apply_status'] == 7){
-            //查询订单类型
-            $orderType = UserApply::where([
-                'order_id'=>$Orderstatus['order_id']
-            ])->value('order_type');
             if($orderType){
                 //共享
                 BusinessUser::where([
@@ -250,6 +285,23 @@ class OrderController extends Controller
             }
         }
         $OrderUpdate = DB::table('user_apply')->where(['order_id'=>$Orderstatus['order_id']])->update($update);
+
+        // 发送极光推送
+        try{
+            if($orderType){
+                // 共享订单
+                $type = 2;
+
+            }else{
+                // C端用户
+                $type = 1;
+            }
+            $this->push->sendMessage($type,UserApply::where(['order_id'=>$Orderstatus['order_id']])->value('user_id'),$message);
+        }catch (\Exception $exception){
+            $this->log->logs("发送极光消息失败--改变订单状态(Bapi/OrderController line:275)",$Orderstatus);
+        }
+
+
         $retJson = returnStatus($OrderUpdate);
         return response()->json($retJson);
     }

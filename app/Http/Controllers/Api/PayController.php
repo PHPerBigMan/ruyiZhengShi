@@ -97,10 +97,26 @@ class PayController extends Controller
         if($notify_data['result_pay'] == "SUCCESS"){
            // 支付成功
            if($notify_data['info_order'] == 2){
-               // B端支付 修改支付状态
-               $s = UserApply::where('order_id',$notify_data['no_order'])->update([
-                   'b_apply_status'=>4
-               ]);
+               // B端支付 修改支付状态  判断是否是共享订单 且获取一次 B端当做C端时是否已支付
+               $orderType = UserApply::where('order_id',$notify_data['no_order'])->first();
+               if($orderType->order_type == 1){
+                   // 是共享订单
+                   if($orderType->c_apply_status != 0){
+                       // C端已支付 更改B端数据
+                       UserApply::where('order_id',$notify_data['no_order'])->update([
+                           'b_apply_status'=>4
+                       ]);
+                   }else{
+                       // C端未支付 更改C端数据
+                       UserApply::where('order_id',$notify_data['no_order'])->update([
+                           'c_apply_status'=>4
+                       ]);
+                   }
+               }else{
+                   $s = UserApply::where('order_id',$notify_data['no_order'])->update([
+                       'b_apply_status'=>4
+                   ]);
+               }
            }else{
                // C端支付 修改支付状态
               $s =  UserApply::where('order_id',$notify_data['no_order'])->update([

@@ -255,6 +255,11 @@ class ApplyController extends Controller {
         $orderForm = OrderApplyForm::where('order_id',$Order['order_id'])->first();
         $need_data = json_decode($orderForm->need_data,true);
         $content1   = json_decode($orderForm->data,true);
+        if(empty($content1)){
+            $content1 = ApplyForm::getData($Order);
+        }
+        $ss= new Logs();
+        $ss->logs("支付页面订单详情1",$content1);
         $content2   = json_decode($orderData->content,true);
         $content   = array_merge($content1,$need_data);
         $use_title = ['lending_type','property','accrual','lending_cycle','is_home','is_home','company','matching','score','id','count','rate','order_id','other','other_need','audit_time'];
@@ -496,6 +501,5 @@ class ApplyController extends Controller {
 
         return response()->json($retData);
     }
-
 
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
+use App\Model\BusinessUser;
 use App\Model\Product;
+use App\Model\ProductCat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -210,5 +212,46 @@ class ProductController extends Controller
             return ['code' => 200, 'msg' => '更新成功'];
         }
         return ['code' => 404, 'msg' => '更新出错'];
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * author hongwenyang
+     * method description : 已上传产品的用户
+     */
+    public function productList(Request $request){
+       $keyword = $request->input('keyword');
+
+       $data =  BusinessUser::getUserProduct($keyword);
+
+       $Pagetitle = 'Product';
+
+       return view('Back.business.index',compact('data','Pagetitle','keyword'));
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * author hongwenyang
+     * method description : B端用户已上传产品分类列表
+     */
+    public function productCat($id){
+        $data = BusinessUser::getUserProductCat($id);
+
+        $Pagetitle = 'Product';
+
+        $companyName = BusinessUser::where('id',$id)->value('companyName');
+
+        return view('Back.business.catList',compact('data','Pagetitle','id','companyName'));
+    }
+
+    public function productCatMore($id,$cat_id){
+       $data =  BusinessUser::CatProduct($id,$cat_id);
+//       dd($data);
+       $Pagetitle = 'Product';
+
+       $catName = ProductCat::where('id',$cat_id)->value('cat_name');
+
+       return view('Back.business.productList',compact('data','Pagetitle','catName'));
     }
 }

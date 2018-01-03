@@ -5,6 +5,7 @@
  * Date: 2017/9/18
  * Time: 11:54
  */
+use App\Http\Controllers\PushController;
 use App\Model\Logs;
 use App\Model\OrderApplyForm;
 use Illuminate\Http\Request;
@@ -751,6 +752,14 @@ function SaveEvaluate($EvaluateData,$type){
     if($s){
         $retJson['code'] = 200;
         $retJson['msg']  = '评价成功';
+        // 发送极光推送消息
+        try{
+            $JGMessage = new PushController();
+            $JGMessage->sendMessage(1,$SaveData->user_id,"订单已被评价，请进入app查看详情");
+        }catch (Exception $exception){
+            $log = new Logs();
+            $log->logs("发送极光消息失败---C端发送评价",$SaveData->user_id);
+        }
     }else{
         $retJson['code'] = 404;
         $retJson['msg']  = '评价失败';
@@ -863,6 +872,7 @@ function IdBelonging($data){
     }
     return $belonging;
 }
+
 
 
 

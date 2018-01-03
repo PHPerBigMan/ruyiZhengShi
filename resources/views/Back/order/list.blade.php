@@ -69,7 +69,7 @@
             <tbody>
             @foreach($data as $value)
                 <tr id="{{ $value->id }}">
-                    <td>{{ $value->order_id }}</td>
+                    <td onclick="readMore({{ $value->id }})" style="cursor: pointer">{{ $value->order_id }}</td>
                     <td>
                         {{ $value->pNumber }}
                     </td>
@@ -266,6 +266,10 @@
                     layer.msg(obj.msg,{type:2});
                 }
             })
+        }
+
+        function readMore(id) {
+            layer_open("订单详情",'/back/orderRead/readMore/'+id,880,660);
         }
     </script>
 @endsection

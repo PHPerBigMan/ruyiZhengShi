@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PushController;
+use App\Model\BusinessUser;
+use App\Model\Logs;
 use App\Model\Order;
+use App\Model\OrderApplyForm;
+use App\Model\Product;
+use App\Model\User;
 use App\Model\UserApply;
 use App\Model\Yinlian;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -16,9 +22,12 @@ use Symfony\Component\HttpFoundation\Request;
 class OrderController extends Controller
 {
     protected $model = "";
+    protected $push,$log;
     public function __construct()
     {
         $this->model = new Order();
+        $this->push = new PushController();
+        $this->log = new Logs();
     }
 
     /**
@@ -219,6 +228,26 @@ class OrderController extends Controller
             'id'=>$data['id']
         ])->update($update);
 
+        if($s){
+            try{
+                if($data['apply_type'] == 0){
+                    // 发送极光消息
+                    $type = 1;
+                    if($orderType->order_type){
+                        // 共享订单 此时的C端用户为B端
+                        $type = 2;
+                    }
+                    $this->push->sendMessage($type,$orderType->user_id,"您的订单支付审核已有结果，请进入app查看详情");
+                }else{
+                    // B端支付时 获取上传产品对应的B端用户
+                    $user_id = Product::where('id',UserApply::where('id',$data['id'])->value('product_id'))->value('business_id');
+                    $this->push->sendMessage(2,$user_id,"您的订单支付审核已有结果，请进入app查看详情");
+                }
+            }catch (\Exception $exception){
+                $this->log->logs("发送极光推送消息异常--总后台修改订单状态 (Back/OrderController line:244)",$data);
+            }
+
+        }
         /**
          * 支付审核不通过 退款用户抵扣的金币
          */
@@ -254,5 +283,27 @@ class OrderController extends Controller
             $code = 200;
         }
         return response()->json(['code'=>$code]);
+    }
+
+    public function readMore($id){
+
+        $ApplyUser = array();
+        // 查询订单数据
+        $data = UserApply::findOrFail($id);
+
+        // 查询借款人信息 填写的信息
+        $ApplyUser = OrderApplyForm::where('order_id',$data->order_id)->first();
+
+        // 用户基本信息
+        $userInfo = Order::ReadMoreOrder($data);
+
+        // 产品信息
+        $product = Product::findOrFail($data->product_id);
+
+        if(!empty($product)){
+            $product->content = json_decode($product->content);
+        }
+//        dd($ApplyUser);
+        return view('Back.order.readMore',compact('data','ApplyUser','userInfo','product'));
     }
 }

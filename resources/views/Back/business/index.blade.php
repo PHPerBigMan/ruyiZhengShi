@@ -2,92 +2,45 @@
 @section('main')
     <div class="demoTable productCat">
         <form action="">
-            <select name="is_pass" id="select-type" class="order-select">
-                <option value="3" <?php if($is_pass == 3)echo "selected";?>>全部</option>
-                <option value="0" <?php if($is_pass == 0)echo "selected";?>>未通过</option>
-                <option value="1" <?php if($is_pass == 1)echo "selected";?>>已通过</option>
-                <option value="2" <?php if($is_pass == 2)echo "selected";?>>审核中</option>
-            </select>
             <div class="layui-inline">
-                <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="用户名或手机号">
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">时间：</label>
-                <div class="layui-input-inline">
-                    <input type="text" class="layui-input" id="test10" placeholder=" - " style="width: 300px" name="exTime" value="{{ $time }}">
-                </div>
+                <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="企业名称">
             </div>
             <button class="layui-btn" data-type="reload">搜索</button>
         </form>
-        <button  onclick="excel()" class="layui-btn">导出用户</button>
     </div>
     <div class="layui-form table-data">
         <table class="layui-table">
             <colgroup>
                 <col width="50">
                 <col width="150">
-                <col width="20">
-                <col width="80">
-                <col width="50">
-                <col width="80">
-                <col width="80">
-                <col width="80">
-                <col width="80">
-                <col width="60">
-                <col width="120">
+                <col width="350">
+                <col width="180">
                 <col>
             </colgroup>
             <thead>
             <tr>
+                <th>ID</th>
                 <th>企业编号</th>
                 <th>企业名称</th>
-                <th>企业代码</th>
-                <th>企业法人</th>
-                <th>法人联系电话</th>
-                <th>是否通过审核</th>
-                <th>身份证</th>
-                <th>身份证归属地</th>
-                <th>如易金币</th>
-                <th>如易金券</th>
-                <th>注册时间</th>
                 <th>操作</th>
             </tr>
             </thead>
             <tbody>
             @foreach($data as $value)
                 <tr>
+                    <td>{{ $value->id }}</td>
                     <td>{{ $value->number }}</td>
                     <td>
                         {{ $value->companyName }}
                     </td>
-                    <td>{{ $value->companyCode }}</td>
-                    <td>{{ $value->companyLegal }}</td>
-                    <td>{{ $value->phone }}</td>
-                    <td id="{{ $value->id }}">
-                        @if($value->is_pass == 0)
-                             未通过
-                            @elseif($value->is_pass == 1)
-                            已通过
-                            @elseif($value->is_pass == 2)
-                            审核中
-                            @endif
-                    </td>
-                    <td>{{ $value->idcard }}</td>
-                    <td>{{ $value->belonging }}</td>
-                    <td>{{ $value->integral }}</td>
-                    <td>{{ $value->gold }}</td>
-                    <td>{{ $value->create_time }}</td>
                     <td>
-                        <a href="{{ route('company.detail', ['id' => $value->id]) }}" class="layui-btn layui-btn-small">用户信息</a>
-                        <button class="layui-btn layui-btn-small" onclick="is_pass({{ $value->id }},1)">通过审核</button>
-                        <button class="layui-btn layui-btn-small layui-btn-danger" onclick="is_pass({{ $value->id }},0)">审核不通过</button>
-                        <p class="layui-btn layui-btn-small" onclick="add({{ $value->id }})">增加如易金币</p>
+                        <a class="layui-btn layui-btn-small" href="product/cat/{{ $value->id }}">查看产品</a>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-        {{ $data->appends(['keyword' => $keyword,'is_pass'=>$is_pass,'exTime'=>$time])->links() }}
+        {{ $data->appends(['keyword'=>$keyword])->links() }}
     </div>
 
 @endsection

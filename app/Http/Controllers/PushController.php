@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Model\Logs;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use JPush\Client as JpushClient;
+
+class PushController extends Controller
+{
+
+    /**
+     * @param $alias
+     * @param $message
+     * author hongwenyang
+     * method description : 推送给单独的用户  C端用户
+     */
+    public function pushMessage($type,$alias,$message){
+        if($type == 1){
+            $config = config('app.JPushC');
+        }else{
+            $config = config('app.JPushB');
+        }
+        $client = new JpushClient($config['appKey'],$config['masterSecret']);
+        try{
+            $client->push()
+                ->setPlatform(array('ios', 'android'))
+                ->addAlias(array("$alias"))
+                ->androidNotification($message, array(
+                    'title' => '如易金服',
+                ))
+                ->iosNotification($message, array(
+                    'sound' => 'sound.caf',
+                    'category' => 'jiguang',
+                ))
+                ->options(array(
+                    'apns_production' => false,
+                ))
+                ->send();
+        }catch (\Exception $exception){
+            $log = new Logs();
+            $log->logs("发送极光推送消息",[$alias,$message]);
+        }
+    }
+
+    /**
+     * @param $message
+     * author hongwenyang
+     * method description : 推送给所有的用户
+     */
+    public function AllUserMessage($type,$message){
+        if($type == 1){
+            $config = config('app.JPushC');
+        }else{
+            $config = config('app.JPushB');
+        }
+        $client = new JpushClient($config['appKey'],$config['masterSecret']);
+        try{
+            $client->push()
+                ->setPlatform('all')
+                ->addAllAudience()
+                ->setNotificationAlert('Hello, JPush')
+                ->send();
+        }catch (\Exception $exception){
+            $log = new Logs();
+            $log->logs("发送极光推送消息",[$message]);
+        }
+    }
+
+    public function send(){
+        $this->pushMessage(1,60,"您有一笔新订单,您注意查看!");
+    }
+
+
+    public function sendMessage($type,$id,$message){
+        $this->pushMessage($type,$id,$message);
+    }
+}

@@ -47,6 +47,9 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin','use
     Route::post('/admin/edit','AdminController@edit');
     Route::get('dashboard','IndexController@detail');
     Route::get('/product/Plist','ProductController@Plist');
+    Route::get('/product','ProductController@productList');
+    Route::get('/product/cat/{id}','ProductController@productCat');
+    Route::get('/product/catMore/{id}/{cat_id}','ProductController@productCatMore');
     Route::get('/product/SecCat/{pid}','ProductController@SecCat');
     Route::post('/product/cat_del','ProductController@cat_del');
     Route::post('/product/sec_cat_del','ProductController@sec_cat_del');
@@ -67,6 +70,7 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin','use
     Route::get('/order/{type}','OrderController@orderList');
     Route::post('/order/orderChange','OrderController@orderChange');
     Route::post('/order/orderCancel','OrderController@orderCancel');
+    Route::get('/orderRead/readMore/{id}','OrderController@readMore');
     Route::any('/order/checkOrderStatus','OrderController@checkOrderStatus');
     Route::get('/setting','SettingController@SettingList');
     Route::get('/setting/serve','SettingController@Serve');
@@ -102,11 +106,13 @@ Route::group(['prefix'=>'business','namespace'=>'Business'],function(){
     Route::get('/settled','SettledController@index');
 });
 
+Route::get('/JPush', 'PushController@send');
+
 
 Route::group(['prefix'=>'business','namespace'=>'Business','middleware'=>'BusinessIsLogin'],function(){
     Route::get('/demo','ApplyController@demo');
     Route::get('/back','ProductController@index');
-    Route::post('/productList','ProductController@productList');
+    Route::get('/product','ProductController@productList');
     Route::post('/ProductSecondCat','ProductController@ProductSecondCat');
     Route::post('/productSave','ProductController@productSave');
     Route::post('/productDel','ProductController@productDel');

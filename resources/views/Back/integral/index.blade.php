@@ -17,6 +17,7 @@
                 <th>金币</th>
                 <th>说明</th>
                 <th>用户类型</th>
+                <th>金币类型</th>
                 <th>生成时间</th>
             </tr>
             </thead>
@@ -30,6 +31,7 @@
                     </td>
                     <td>{{ $value->desc }}</td>
                     <td>{{ $value->user_type_info }}</td>
+                    <td>{{ $value->is_gold }}</td>
                     <td>{{ $value->create_time }}</td>
                 </tr>
             @endforeach

@@ -144,7 +144,7 @@ class ApplyForm extends Model{
         //商品信息
         $ProductData = DB::table('product')
             ->join('business_user','business_user.id','=','product.business_id')
-            ->where(['product.cat_id'=>$ApplyData['cat_id']])
+            ->where(['product.cat_id'=>$ApplyData['cat_id'],'product.is_del'=>0])
             ->select('product.*','business_user.number')
             ->get();
 
@@ -400,4 +400,27 @@ class ApplyForm extends Model{
     }
 
 
+    /**
+     * @param $data
+     * @return array|mixed
+     * author hongwenyang
+     * method description : 如果结算的时候担保品数据丢失了，先拿存储的数据抵挡一下
+     */
+    public static function getData($data){
+        $get = array();
+        // 查找用户的担保品数据
+        $productId= UserApply::where('order_id',$data['order_id'])->first();
+        // 查找分类
+        $productCat = Product::where('id',$productId->product_id)->value('cat_id');
+        // 查找用户的担保品数据
+        if($data['applicantType']){
+            $get = json_decode(ApplyForm::where([
+                'user_id'=>$productId->user_id,
+                'cat_id'=>$productCat,
+                'equipment_type'=>$data['applicantType']
+            ])->value('data'),true);
+        }
+
+        return $get;
+    }
 }

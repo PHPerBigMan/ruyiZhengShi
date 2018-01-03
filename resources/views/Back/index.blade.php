@@ -32,6 +32,18 @@
               <dd class="<?php if($Pagetitle == 'ProductCatList'){echo 'layui-this';}?>"><a href="/back" @click="secondCat()" id="">分类列表</a></dd>
             </dl>
           </li>
+
+            <?php
+            $title = [
+                'Product'
+            ];
+            ?>
+          <li class="layui-nav-item <?php if(in_array($Pagetitle,$title)){echo 'layui-nav-itemed';}?>">
+            <a class="" href="javascript:;">产品列表</a>
+            <dl class="layui-nav-child ">
+              <dd class="<?php if($Pagetitle == 'Product'){echo 'layui-this';}?>"><a href="/back/product" id="">产品列表</a></dd>
+            </dl>
+          </li>
             <?php
             $title = [
                 'userC',

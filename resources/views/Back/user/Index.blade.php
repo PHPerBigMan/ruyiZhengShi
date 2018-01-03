@@ -36,7 +36,9 @@
                 <th>注册时间</th>
                 <th>身份证归属地</th>
                 <th>推荐人ID</th>
-                <th>访问次数</th>
+                <th>如易金币</th>
+                <th>如易金券</th>
+                {{--<th>访问次数</th>--}}
                 <th>操作</th>
             </tr>
             </thead>
@@ -52,7 +54,9 @@
                     <td>{{ $value->create_time }}</td>
                     <td>{{ $value->belonging }}</td>
                     <td>{{ empty($value->tuiUserId) ? "非推荐" : $value->tuiUserId}}</td>
-                    <td>{{ $value->view_count }}</td>
+                    <td id="integral">{{ $value->integral }}</td>
+                    <td id="gold">{{ $value->gold }}</td>
+                    {{--<td>{{ $value->view_count }}</td>--}}
                     <td>
                         <a href="{{ route('user.detail', ['id' => $value->id]) }}" class="layui-btn layui-btn-small">查看用户信息</a>
                         <p class="layui-btn layui-btn-small" onclick="add({{ $value->id }})">增加如易金币</p>
@@ -117,14 +121,27 @@
             });
         }
 
+        /**
+         * 为用户增加如易金券
+         * @param id
+         */
         function add(id) {
+            var integral = $('#integral').val();
+            var gold = $('#gold').val();
             layer.prompt({title: '输入需要充值的金币数额', formType: 3}, function(count, index){
                 layer.close(index);
                 layer.confirm("确定要为该用户增加<span style='color: red'>"+count+"</span>金币", {
                     btn: ['确定','取消'] //按钮
-                }, function(){
+                }, function(index1){
+                    layer.close(index1);
                    $.post('addInt',{count:count,id:id,type:1},function (obj) {
-                       
+
+                       layer.msg(obj.msg+"本页面将在2秒后自动刷新！",{time:2});
+                       if(obj.code == 200){
+                         setTimeout(function () {
+                             location.reload();
+                         },2000);
+                       }
                    });
                 });
             });

@@ -19,7 +19,7 @@ class BusinessUser extends Model{
         return date('YmdHis',strtotime($value));
     }
 
-    
+
     /**
      * @param $data
      * @return mixed
@@ -439,5 +439,66 @@ class BusinessUser extends Model{
             'count'=>$Count,
         ];
         return $return;
+    }
+
+    /**
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * author hongwenyang
+     * method description : 获取已上传产品的用户信息
+     */
+    public static function getUserProduct($keyword = ""){
+        $data           = array();
+        $returnData     = array();
+
+        $data = BusinessUser::join('product as p','p.business_id','=','business_user.id')
+            ->where('business_user.companyName','like',"%$keyword%")
+            ->groupBy('business_id')->pluck('business_id');
+
+        $returnData = BusinessUser::whereIn('id',$data)->select('id','companyName','number')->paginate(15);
+
+        return $returnData;
+    }
+
+    /**
+     * @param $id
+     * @return array|\Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * author hongwenyang
+     * method description :B端用户已上传产品分类列表
+     */
+
+    public static function getUserProductCat($id){
+        $cat            = array();
+        $catId          = array();
+
+        $catId  =  Product::where(['business_id'=>$id,'is_del'=>0])->pluck('cat_id');
+
+        $cat = ProductCat::whereIn('id',$catId)->where('is_del',0)->paginate(15);
+
+        if($catId->isNotEmpty()){
+            foreach($cat as $v){
+                $v->count = Product::where(['business_id'=>$id,'cat_id'=>$v->id,'is_del'=>0])->count();
+            }
+        }
+        return $cat;
+    }
+
+    /**
+     * @param $id
+     * @param $cat_id
+     * @return array|\Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * author hongwenyang
+     * method description : 获取对应用户对应分类的产品详情
+     */
+    public static  function CatProduct($id,$cat_id){
+        $data = array();
+        $data = Product::where(['business_id'=>$id,'cat_id'=>$cat_id,'is_del'=>0])->paginate(15);
+
+        if(!$data->isEmpty()){
+            foreach($data as $v){
+                $v->content = json_decode($v->content);
+            }
+        }
+
+        return $data;
     }
 }

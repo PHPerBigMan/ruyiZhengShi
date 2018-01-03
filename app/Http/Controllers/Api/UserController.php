@@ -66,6 +66,7 @@ class UserController extends Controller {
         if(!empty($SaveData['user_idcard'])){
             $SaveData['belonging'] = IdBelonging($SaveData['user_idcard']);
         }
+
         $s = DB::table('user')->where(['id'=>$id])->update($SaveData);
 
         if($s){
@@ -256,8 +257,18 @@ class UserController extends Controller {
                // 超过7天的订单不能取消
                $retJson['code'] = 404;
                $retJson['msg']  = '订单时效超过7天不能取消';
+           }else{
+               $s = DB::table('user_apply')->where($map)->update($ChangeData);
+               if($s){
+                   $retJson['code'] = 200;
+                   $retJson['msg']  = '状态更改成功';
+               }else{
+                   $retJson['code'] = 404;
+                   $retJson['msg']  = '状态更改失败';
+               }
            }
        }else{
+
            $s = DB::table('user_apply')->where($map)->update($ChangeData);
            if($s){
                $retJson['code'] = 200;
@@ -338,6 +349,8 @@ class UserController extends Controller {
         $Inlist = [];
         $ruyi = "";
         $syDay = 0;
+        $ss = new Logs();
+        $ss->logs('下单',$userId);
         if($userId['equipment_type'] == 1){
             $userId['user_id'] = $userId['business_id'];
             $table = 'business_user';
