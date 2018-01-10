@@ -27,6 +27,10 @@
                 <td><input type="text" value="{{ $user->companyLegal }}" class="layui-input" name="companyLegal"></td>
             </tr>
             <tr>
+                <td>法人身份证</td>
+                <td><input type="text" value="{{ $user->idcard }}" class="layui-input" name="idcard"></td>
+            </tr>
+            <tr>
                 <td>法人联系电话</td>
                 <td><input type="text" value="{{ $user->phone }}" class="layui-input" name="phone"></td>
             </tr>

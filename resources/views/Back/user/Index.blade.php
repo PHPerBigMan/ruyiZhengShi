@@ -3,7 +3,7 @@
     <div class="demoTable productCat">
         <form action="">
             <div class="layui-inline">
-                <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="用户名或手机号">
+                <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="手机号" value="{{ $keyword }}">
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">时间：</label>
@@ -11,8 +11,10 @@
                     <input type="text" class="layui-input" id="test10" placeholder=" - " style="width: 300px" name="exTime" value="{{ $time }}">
                 </div>
             </div>
+
             <button class="layui-btn" data-type="reload">搜索</button>
         </form>
+        <button  onclick="excel()" class="layui-btn">导出用户</button>
     </div>
     <div class="layui-form table-data">
         <table class="layui-table">
@@ -36,8 +38,8 @@
                 <th>注册时间</th>
                 <th>身份证归属地</th>
                 <th>推荐人ID</th>
-                <th>如易金币</th>
                 <th>如易金券</th>
+                <th>如易金币</th>
                 {{--<th>访问次数</th>--}}
                 <th>操作</th>
             </tr>
@@ -145,6 +147,14 @@
                    });
                 });
             });
+        }
+
+        function excel() {
+            // 关键词
+            var keyword = $('#demoReload').val();
+
+            var time = $('#test10').val();
+            location.href = "/back/excel?exl=userC&keyword="+keyword+"&time="+time;
         }
     </script>
 @endsection

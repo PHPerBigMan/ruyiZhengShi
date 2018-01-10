@@ -352,17 +352,24 @@ class ApplyController extends Controller {
     public function YinlianPay(Request $request){
         $OrderId = $request->except(['s']);
         //处理上传凭证图片
-        $ss = new Logs();
-        $ss->logs("重新支付",$OrderId);
+        $imgs = array();
         $save = $request->file('imgs');
-        foreach($save as $k=>$v){
-            $imgs[$k] = '/uploads/'.$v->store('img','img');
+
+        if($save){
+            foreach($save as $k=>$v){
+                $imgs[$k] = '/uploads/'.$v->store('img','img');
+            }
         }
-        $Icon = $OrderId['Icon'];
+
+        $Icon = 0;
+        if(isset($OrderId['Icon'])){
+            $Icon = $OrderId['Icon'];
+        }
         $ss = new Logs();
         $ss->logs("线下支付",$OrderId);
         unset($OrderId['imgs']);
         unset($OrderId['Icon']);
+
         $OrderId['img'] = json_encode($imgs);
 
         //如果 C端用户未支付 修改 c_apply_status  如果  C端用户已支付 修改 b_apply_status
@@ -371,8 +378,6 @@ class ApplyController extends Controller {
         }else{
             $update['b_apply_status'] = 3;
         }
-//        unset($OrderId['type']);
-
 
         // 记录b端服务费
         $orderCount = DB::table('user_apply')->where('order_id',$OrderId['order_id'])->value('order_count');
@@ -465,15 +470,19 @@ class ApplyController extends Controller {
 
     public function isShen(Request $request){
         $type = $request->input('type');
-        if(isset($type)){
+        if($type == "c1"){
             $code = 404;
             // 如果审核过  显示 审核通过
 //            $msg  = "c端审核通过" ;
             $msg  = "审核未通过" ;
+        }else if($type == "b1"){
+            $code = 200;
+            // 如果审核过  显示 审核通过
+            $msg  = "审核未通过" ;
         }else{
             $code = 200;
             // 如果审核过  显示 审核通过
-            $msg  = "b端审核通过" ;
+            $msg  = "审核通过" ;
         }
 
 
@@ -502,4 +511,42 @@ class ApplyController extends Controller {
         return response()->json($retData);
     }
 
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * author hongwenyang
+     * method description : 获取身份证
+     */
+    public function getUserIdNo(Request $request){
+        $UserIdCard     = "";
+        $post           = $request->except(['s']);
+        $is_company     = 0;
+        $catArray       = [35,36,62,63,64,65,66,67,68,69,70,71];
+        if(in_array($post['cat_id'],$catArray)){
+            // 企业资料
+            $is_company = 1;
+        }
+
+        $data = ApplyBasic::where([
+            'user_id'=>$post['user_id'],
+            'type'=>$post['applicantType'],
+            'is_company'=>$is_company
+        ])->value('data');
+
+        $returnData = json_decode("{}");
+        if(!empty($data)){
+            $returnData->user_name = $data->name;
+            $returnData->phone = $data->phone;
+            $returnData->idcard = $data->idCard;
+            if($post['applicantType']){
+                // B端用户
+                $returnData->created_at  = BusinessUser::where('id',$post['user_id'])->value('create_time');
+            }else{
+                $returnData->created_at = User::where('id',$post['user_id'])->value('create_time');
+            }
+        }
+
+        return response()->json(returnData($returnData));
+    }
 }

@@ -40,6 +40,7 @@
                 <th>产品编号</th>
                 <th>订单总额</th>
                 <th>订单类型</th>
+                <th>下单用户</th>
                 <th>产品所属企业</th>
                 <th>产品所属企业编号</th>
                 <th>产品分类</th>
@@ -75,6 +76,7 @@
                     </td>
                     <td>{{ $value->order_count }}</td>
                     <td>{{ $value->order_type == 0 ? "普通订单" : "共享订单" }}</td>
+                    <td>{{ $value->userName }}</td>
                     <td>{{ $value->companyName }}</td>
                     <td>{{ $value->number }}</td>
                     <td>{{ $value->cat_name }}</td>

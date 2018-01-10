@@ -1,7 +1,17 @@
 <?php
 
 return [
+    'JPushC'      =>[
+        'appKey'=>'42214598c08203e01b6eb2a9',
+        'masterSecret'=>'41d668919e0c3082377a6d14'
+    ],
 
+    'JPushB'      =>[
+        'appKey'=>'a779de4c050010dde2492797',
+        'masterSecret'=>'10ac4046b165be761a06b3e2'
+    ],
+    'apns_production'=>'true',
+    'IdBelonging'=>'f6a220fb886a8b2457726d1d64e281f8',
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -184,6 +194,7 @@ return [
         //  QrCode
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+//        JPush\Client::class
     ],
 
     /*
@@ -234,6 +245,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+//        'Jpush' => JPush\Client::class,
     ],
 
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Back;
 use App\Model\BusinessUser;
+use App\Model\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,11 @@ class ExcelController extends Controller
             $data = $this->getUser($export,2);
             
             $this->UserExport($data,2);
+        }else if($export['exl'] == "userC"){
+            // 导出C端用户信息
+            $data = $this->getUser($export,1);
+
+            $this->UserExport($data,1);
         }
 
     }
@@ -136,21 +142,29 @@ class ExcelController extends Controller
         if(!empty($export['keyword'])){
            if($type == 1){
                // C 端用户
+               $userName = [
+                   'phone'=>$export['keyword']
+               ];
+               $where =  array_merge($where,$userName);
            }else{
                // B 端用户
                $companyName = [
-                   'companyName'=>$export['keyword']
+                   'phone'=>$export['keyword']
                ];
                $where =  array_merge($where,$companyName);
            }
         }
 
-        if($export['selectType'] != 3){
-            $is_pass = [
-                'is_pass'=>$export['selectType']
-            ];
-            $where = array_merge($is_pass,$where);
+        // B端查询数据时使用
+        if(isset($export['selectType'])){
+            if($export['selectType'] != 3){
+                $is_pass = [
+                    'is_pass'=>$export['selectType']
+                ];
+                $where = array_merge($is_pass,$where);
+            }
         }
+
 
         if($export['time'] != ""){
             $time = explode(' - ',$export['time']);
@@ -159,7 +173,7 @@ class ExcelController extends Controller
             $whereBetween = ["1997-01-01","2999-12-31"];
         }
         if($type == 1){
-
+            $data = User::where($where)->whereBetween('create_time',$whereBetween)->get();
         }else{
             $data = BusinessUser::where($where)->whereBetween('create_time',$whereBetween)->get();
         }
@@ -217,43 +231,80 @@ class ExcelController extends Controller
         if(empty($data)){
 //            return view('errors.404');
         }else{
-            $exportData = [
-                ['企业编号','身份证','公司名称','企业代码','企业地址','企业法人','法人联系电话','金融管家','管家联系电话'
-                ,'如易金币','审核状态']
-            ];
-            foreach ($data as $k=>$v){
-                $exportData[$k+1][0] = $v->number;
-                $exportData[$k+1][1] = $v->idcard;
-                $exportData[$k+1][2] = $v->companyName;
-                $exportData[$k+1][3] = $v->companyCode;
-                $exportData[$k+1][4] = $v->companyAddress;
-                $exportData[$k+1][5] = $v->companyLegal;
-                $exportData[$k+1][6] = $v->phone;
-                $exportData[$k+1][7] = $v->companyHouse;
-                $exportData[$k+1][8] = $v->companyHousePhone;
-                $exportData[$k+1][9] = $v->integral;
-                $exportData[$k+1][10] = $v->is_pass == 0 ? "审核未通过" : $v->is_pass == 1 ? "审核通过" : "审核中";
-            }
 
-            Excel::create('商户端用户数据',function($excel) use ($exportData){
-                $excel->sheet('商户端用户数据', function($sheet) use ($exportData){
-                    $sheet->rows($exportData,function ($row){
+            if($type == 2){
+                $exportData = [
+                    ['企业编号','身份证','公司名称','企业代码','企业地址','企业法人','法人联系电话','金融管家','管家联系电话'
+                        ,'如易金币','审核状态']
+                ];
+                foreach ($data as $k=>$v){
+                    $exportData[$k+1][0] = $v->number;
+                    $exportData[$k+1][1] = $v->idcard;
+                    $exportData[$k+1][2] = $v->companyName;
+                    $exportData[$k+1][3] = $v->companyCode;
+                    $exportData[$k+1][4] = $v->companyAddress;
+                    $exportData[$k+1][5] = $v->companyLegal;
+                    $exportData[$k+1][6] = $v->phone;
+                    $exportData[$k+1][7] = $v->companyHouse;
+                    $exportData[$k+1][8] = $v->companyHousePhone;
+                    $exportData[$k+1][9] = $v->integral;
+                    $exportData[$k+1][10] = $v->is_pass == 0 ? "审核未通过" : $v->is_pass == 1 ? "审核通过" : "审核中";
+                }
+
+                Excel::create('商户端用户数据',function($excel) use ($exportData){
+                    $excel->sheet('商户端用户数据', function($sheet) use ($exportData){
+                        $sheet->rows($exportData,function ($row){
+                        });
+                        $sheet->setWidth(array(
+                            'A'     =>  20,
+                            'B'     =>  20,
+                            'C'     =>  20,
+                            'D'     =>  20,
+                            'E'     =>  20,
+                            'F'     =>  20,
+                            'G'     =>  20,
+                            'H'     =>  20,
+                            'I'     =>  20,
+                            'J'     =>  20,
+                            'K'     =>  20,
+                        ));
                     });
-                    $sheet->setWidth(array(
-                        'A'     =>  20,
-                        'B'     =>  20,
-                        'C'     =>  20,
-                        'D'     =>  20,
-                        'E'     =>  20,
-                        'F'     =>  20,
-                        'G'     =>  20,
-                        'H'     =>  20,
-                        'I'     =>  20,
-                        'J'     =>  20,
-                        'K'     =>  20,
-                    ));
-                });
-            })->export('xls');
+                })->export('xls');
+            }else{
+
+                $exportData = [
+                    ['用户名','手机号','身份证归属地','推荐人ID','如易金币','如易金券','注册时间']
+                ];
+                foreach ($data as $k=>$v){
+                    $exportData[$k+1][0] = $v->user_name;
+                    $exportData[$k+1][1] = $v->phone;
+                    $exportData[$k+1][2] = $v->belonging;
+                    $exportData[$k+1][3] = $v->is_tui == 0 ? "非推荐" : $v->is_tui;
+                    $exportData[$k+1][4] = $v->integral;
+                    $exportData[$k+1][5] = $v->gold;
+                    $exportData[$k+1][6] = date("Y-m-d H:i:s",strtotime($v->create_time));
+                }
+
+                Excel::create('客户端用户数据',function($excel) use ($exportData){
+                    $excel->sheet('客户端用户数据', function($sheet) use ($exportData){
+                        $sheet->rows($exportData,function ($row){
+                        });
+                        $sheet->setWidth(array(
+                            'A'     =>  20,
+                            'B'     =>  20,
+                            'C'     =>  20,
+                            'D'     =>  20,
+                            'E'     =>  20,
+                            'F'     =>  20,
+                            'G'     =>  20,
+                            'H'     =>  20,
+                            'I'     =>  20,
+                            'J'     =>  20,
+                            'K'     =>  20,
+                        ));
+                    });
+                })->export('xls');
+            }
         }
     }
 }

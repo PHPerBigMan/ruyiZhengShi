@@ -169,7 +169,7 @@ function productData($data,$title){
  */
 
 function ProductCheck($data,$type){
-
+    $Log = new Logs();
     $title = ['money','product_cycle','accrual','lending_type','lending_cycle'];
     $titleDesc= [
         'money'         =>'借款金额',
@@ -349,7 +349,7 @@ function ProductCheck($data,$type){
                     }
                 }
             }catch (\Exception $e){
-                $Log = new Logs();
+
                 $Log->logs('产品缺少参数',88);
             }
 
@@ -358,7 +358,7 @@ function ProductCheck($data,$type){
         //申请的产品 最低匹配分数
         $match_score = DB::table('match_score')->where(['type'=>$type])->value('match_score');
         $CheckProduct[$k]['matching'] = ceil($CheckProduct[$k]['matching']);
-
+        $Log->logs('单独产品匹配分数',$CheckProduct[$k]['matching']);
         //判断匹配的分数是否低于要求
         if($CheckProduct[$k]['matching'] < $match_score){
             foreach($noChecked as $k=>$v){
@@ -588,6 +588,8 @@ function ProductSort($CheckProduct,$SortKey){
     }
     sort($CheckProduct);
 
+    $log = new Logs();
+    $log->logs("排除分数后的产品",$CheckProduct);
     for($i = 1;$i<count($CheckProduct);$i++){
         for ($j = count($CheckProduct)-1;$j>=$i  ;$j-- ){
             if($SortKey == '0' || $SortKey == '2' || $SortKey == '4'){

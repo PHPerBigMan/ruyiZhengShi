@@ -23,27 +23,66 @@ class PushController extends Controller
             $config = config('app.JPushB');
         }
         $client = new JpushClient($config['appKey'],$config['masterSecret']);
+
         try{
-            $client->push()
+
+            $response = $client->push()
                 ->setPlatform(array('ios', 'android'))
-                ->addAlias(array("$alias"))
-                ->androidNotification($message, array(
-                    'title' => '如易金服',
-                ))
+                ->addAlias("$alias")
                 ->iosNotification($message, array(
                     'sound' => 'sound.caf',
                     'category' => 'jiguang',
+                    'extras' => array(
+                        'key' => 'value',
+                        'jiguang'
+                    ),
                 ))
+                ->addAndroidNotification($message,"如易金服")
                 ->options(array(
-                    'apns_production' => false,
+                    'apns_production' => true,
+
                 ))
                 ->send();
+
         }catch (\Exception $exception){
             $log = new Logs();
             $log->logs("发送极光推送消息",[$alias,$message]);
         }
     }
 
+    public function pushMessageTest($type,$alias,$message){
+        if($type == 1){
+            $config = config('app.JPushC');
+        }else{
+            $config = config('app.JPushB');
+        }
+        $client = new JpushClient($config['appKey'],$config['masterSecret']);
+
+        try{
+
+            $response = $client->push()
+                ->setPlatform(array('ios', 'android'))
+                 ->addAlias("$alias")
+                ->iosNotification($message, array(
+                    'sound' => 'sound.caf',
+                    'category' => 'jiguang',
+                    'extras' => array(
+                        'key' => 'value',
+                        'jiguang'
+                    ),
+                ))
+                ->addAndroidNotification($message,"如易金服")
+                ->options(array(
+                    'apns_production' => true,
+
+                ))
+                ->send();
+            dd($response);
+        }catch (\Exception $exception){
+            $log = new Logs();
+            $log->logs("发送极光推送消息",[$alias,$message]);
+        }
+    }
     /**
      * @param $message
      * author hongwenyang
@@ -60,7 +99,7 @@ class PushController extends Controller
             $client->push()
                 ->setPlatform('all')
                 ->addAllAudience()
-                ->setNotificationAlert('Hello, JPush')
+                ->setNotificationAlert($message)
                 ->send();
         }catch (\Exception $exception){
             $log = new Logs();
@@ -69,7 +108,8 @@ class PushController extends Controller
     }
 
     public function send(){
-        $this->pushMessage(1,60,"您有一笔新订单,您注意查看!");
+        $this->pushMessageTest(1,6,"测试一下IOS!");
+//        $this->AllUserMessage(1,"消息测试！");
     }
 
 

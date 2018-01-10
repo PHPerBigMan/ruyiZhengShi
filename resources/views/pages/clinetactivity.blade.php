@@ -19,8 +19,8 @@
 @section('js')
     <script>
         $('.btn').click(function () {
-            // B端分享链接跳转到b端注册
+            // C端分享链接跳转到c端注册
             location.href = '/register/43/0';
         })
     </script>
-    @endsection()
+    @endsection

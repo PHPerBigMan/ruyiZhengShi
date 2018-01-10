@@ -148,15 +148,19 @@ class IndexController extends Controller {
         $type = $request->input('type');
         if($type){
             //B端
-            $img = URL.'/activity';
+            $img = URL.'/activityB';
+            $title = "[如易金服]移动金融智选平台 诚邀入驻";
+            $desc = "海量订单 轻松获客";
         }else{
-            $img = URL.'/clientactivity';
+            $img = URL.'/activityC';
+            $title = "[如易金服]移动金融智选平台  为您服务";
+            $desc = "海量产品 随心选择";
         }
 
         $j = [
             'url'=>$img,
-            'title'=>"【如易金服】现金大派送 100%,就怕你不用",
-            'desc'=>"如易金服推广链接"
+            'title'=>$title,
+            'desc'=>$desc
         ];
 
         return returnData($j);

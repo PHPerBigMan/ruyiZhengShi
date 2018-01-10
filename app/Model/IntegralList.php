@@ -40,8 +40,8 @@ class IntegralList extends Model
 
     public function getIsGoldAttribute($value){
         if($value == 1){
-            return "如易金币";
+            return "如易金券";
         }
-        return "如易金券";
+        return "如易金币";
     }
 }

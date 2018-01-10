@@ -9,7 +9,7 @@
                 <option value="2" <?php if($is_pass == 2)echo "selected";?>>审核中</option>
             </select>
             <div class="layui-inline">
-                <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="用户名或手机号">
+                <input class="layui-input" name="keyword" id="demoReload" autocomplete="off" placeholder="手机号">
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">时间：</label>
@@ -47,8 +47,8 @@
                 <th>是否通过审核</th>
                 <th>身份证</th>
                 <th>身份证归属地</th>
-                <th>如易金币</th>
                 <th>如易金券</th>
+                <th>如易金币</th>
                 <th>注册时间</th>
                 <th>操作</th>
             </tr>

@@ -150,7 +150,17 @@
               <dd class="<?php if($Pagetitle == 'admin'){echo 'layui-this';}?>"><a href="/back/admin">账号管理</a></dd>
             </dl>
           </li>
-
+            <?php
+            $title = [
+                'JPush',
+            ];
+            ?>
+          <li class="layui-nav-item <?php if(in_array($Pagetitle,$title)){echo 'layui-nav-itemed';}?>">
+            <a class="" href="javascript:;">推送消息</a>
+            <dl class="layui-nav-child">
+              <dd class="<?php if($Pagetitle == 'JPush'){echo 'layui-this';}?>"><a href="/back/JPush">推送消息</a></dd>
+            </dl>
+          </li>
 
         </ul>
       </div>

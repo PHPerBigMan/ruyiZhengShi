@@ -129,9 +129,16 @@ class OrderController extends Controller
         foreach($data as $k=>$v){
             $pNumber = json_decode($v->content);
             $v->pNumber = $pNumber->pNumber;
+            if($v->order_type == 1){
+                // B端用户
+                $v->userName = BusinessUser::where('id',$v->user_id)->value('companyName');
+            }else{
+                // C端用户
+                $v->userName = User::where('id',$v->user_id)->value('user_name');
+            }
         }
 
-
+//        dd($data);
         $j = [
             'type'                  =>$type,
             'data'                  =>$data,
@@ -139,7 +146,6 @@ class OrderController extends Controller
             'time'                  =>$nextTime,
             'keyword'               =>isset($_GET['keyword']) ? $_GET['keyword'] : "",
             'searchType'            =>isset($_GET['type']) ? $_GET['type'] :""
-//            'selectType'=>
         ];
 
         return view('Back.order.list',$j);
@@ -285,6 +291,12 @@ class OrderController extends Controller
         return response()->json(['code'=>$code]);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * author hongwenyang
+     * method description : 查询订单详细数据
+     */
     public function readMore($id){
 
         $ApplyUser = array();
@@ -303,7 +315,6 @@ class OrderController extends Controller
         if(!empty($product)){
             $product->content = json_decode($product->content);
         }
-//        dd($ApplyUser);
         return view('Back.order.readMore',compact('data','ApplyUser','userInfo','product'));
     }
 }

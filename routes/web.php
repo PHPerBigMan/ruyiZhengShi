@@ -27,6 +27,12 @@ Route::group(['namespace'=>'Page'],function(){
     Route::get('/clientactivity',function (){
         return view('/pages/clientactivity');
     });
+    Route::get('/activityB',function (){
+        return view('/pages/activeityB');
+    });
+    Route::get('/activityC',function (){
+        return view('/pages/activeityC');
+    });
 });
 
 Route::get('/success', function () {
@@ -91,6 +97,9 @@ Route::group(['prefix'=>'back','namespace'=>'Back','middleware'=>['IsLogin','use
     Route::get('/article', 'ArticleController@index');
     Route::get('/ArticleEdit', 'ArticleController@edit');
     Route::post('/saveArticle', 'ArticleController@save');
+    Route::get('/JPush', 'JPushController@index');
+    Route::get('/JPushSend', 'JPushController@JPushSend');
+    Route::post('/send', 'JPushController@send');
 
 });
 
@@ -213,6 +222,7 @@ Route::group(['prefix'=>'api','namespace'=>'Api','middleware'=>['VerifyCsrfToken
     Route::any('/Lian','ApplyController@Lian');
     Route::any('/demand','ApplyController@demand');
     Route::any('/isShen','ApplyController@isShen');
+    Route::any('/getIdCard','ApplyController@getUserIdNo');
     Route::any('/Sort','ApplyController@Sort');
     Route::any('/evaluate','ProductController@evaluate');
     Route::any('/productRead','ProductController@read');

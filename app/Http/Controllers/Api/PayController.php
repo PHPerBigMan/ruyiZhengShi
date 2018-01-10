@@ -252,6 +252,10 @@ class PayController extends Controller
         //把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
         $prestr = $this->createLinkstring($para_sort);
 
+//        $s = new Logs();
+//        $s->logs('生成Ios的Sign原始',$prestr);
+        $prestr = str_replace("¬ify_url","&notify_url",$prestr);
+        $prestr = str_replace("&amp;","&",$prestr);
         $mysign = "";
 
         $llpay_config['RSA_PRIVATE_KEY'] ='-----BEGIN RSA PRIVATE KEY-----

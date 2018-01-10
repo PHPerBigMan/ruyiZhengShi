@@ -28,7 +28,6 @@ class ApplyBasic extends Model{
      */
 
     public function applyBasic($data){
-
         $title = ['name','sex','idCard','address','phone','merry','job','income','sf','jh'];
         if(empty($data['sf'])){
             $data['sf'] = [];
@@ -46,6 +45,7 @@ class ApplyBasic extends Model{
             //基本资料
             $Basic[$v] = $data[$v];
         }
+
 
         //保存 身份证和结婚证
         if(!empty($data['sf'])){
@@ -68,6 +68,7 @@ class ApplyBasic extends Model{
             $Basic['share'] =  DB::table('match_score')->where(['type'=>2])->value('match_score');
         }
         $Basic = json_encode($Basic);
+
         $is_company = 0;
         $CompanyCatId = [35,36,62,63,64,67,68,70,65,66,71,69];
         if(in_array($data['cat_id'],$CompanyCatId)){
@@ -76,6 +77,7 @@ class ApplyBasic extends Model{
 
 
         $isHave = $this->where(['user_id'=>$data['user_id'],'is_company'=>$is_company,'type'=>$data['applicantType']])->first();
+
         if(empty($isHave)){
             //保存基本资料
            $s =  $this->insert([
@@ -85,6 +87,7 @@ class ApplyBasic extends Model{
                 'is_company'=>$is_company
             ]);
         }else{
+
             $s = $this->where(['user_id'=>$data['user_id'],'type'=>$data['applicantType'],'is_company'=>$is_company])->update([
                 'data'=>$Basic
             ]);
@@ -113,11 +116,11 @@ class ApplyBasic extends Model{
 
     public function applCompanyBasic($data){
         $log = new Logs();
-        $log->logs('保存企业用户基本信息',$data);
-        $title = ['companyName','companyFa','companyAddress','companyType','companyZhu','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt'];
+        $log->logs('保存企业用户基本信息1',$data);
+        $title = ['idcard','companyName','companyFa','companyAddress','companyType','companyZhu','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt'];
         if($data['applicantType'] == 1){
             $data['user_id'] = $data['business_id'];
-            $title = ['companyName','companyFa','companyAddress','companyType','companyZhu','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt','share'];
+            $title = ['idcard','companyName','companyFa','companyAddress','companyType','companyZhu','companyXu','companyMoney','companyCount','companyList','companyGd','companyLd','companyQt','share'];
         }
 
         foreach($title as $k=>$v){

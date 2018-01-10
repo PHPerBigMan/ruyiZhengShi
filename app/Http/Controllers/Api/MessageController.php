@@ -24,6 +24,7 @@ class MessageController extends Controller
             $UserId['user_id'] = $UserId['business_id'];
             unset($UserId['business_id']);
         }
+
         $FirData = DB::table('message')->where($UserId)->where(['type'=>0])->select('title','type','content','create_time','id','is_read')->first();
         $SecData = DB::table('message')->where($UserId)->where(['type'=>1])->select('title','type','content','create_time','img','id','is_read')->first();
         $ThiData = DB::table('message')->where($UserId)->where(['type'=>2])->select('title','type','content','create_time','img','id','is_read')->first();

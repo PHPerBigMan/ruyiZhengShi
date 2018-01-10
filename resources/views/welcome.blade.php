@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable">
         <title>如易金服注册</title>
-        <link rel="stylesheet" href="{{ URL::asset('/css/mobile.css') }}?_v=16">
+        <link rel="stylesheet" href="{{ URL::asset('/css/mobile.css') }}?_v=19">
         <link rel="stylesheet" href="{{ URL::asset('/css/reset.css') }}">
         <link rel="stylesheet" href="{{ URL::asset('/layui/css/layui.mobile.css') }}">
     </head>

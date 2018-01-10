@@ -140,11 +140,69 @@ class ApplyForm extends Model{
             ]);
 
         }
+        $log = new Logs();
 
+        $city = ApplyForm::where(['user_id'=>$ApplyData['user_id'],'cat_id'=>$ApplyData['cat_id'],'equipment_type'=>$ApplyData['applicantType']])->value('data');
+
+        if(!empty($city)){
+            $city = json_decode($city);
+            $city = $city->area;
+        }
+
+        if(empty($city)){
+            $city = "不限 不限 不限";
+        }
+        $log->logs("截取省份1",$city);
+
+        $SearchCity = array();
+        $SearchProvince = array();
+        if($type == 0){
+            if(isset($city)){
+                if(!empty($city)){
+                    $city = explode(' ',$city);
+                    $SearchCity[0] = "不限";
+                    $SearchCity[1] = $city[1];
+
+                    $SearchProvince[0]  = "不限";
+                    $SearchProvince[1]  = $city[0];
+                }
+            }
+        }
+        else{
+            if(isset($city)){
+                        if(!empty($city)){
+                            $city = explode(' ',$city);
+                            if(count($city) == 3){
+                                // IOS
+                                $SearchCity[0] = "不限";
+                                $SearchCity[1] = $city[1];
+
+                                $SearchProvince[0]  = "不限";
+                                $SearchProvince[1]  = $city[0];
+                            }else{
+                                // 安卓
+                                $SearchCity[0] = "不限";
+                                $SearchCity[1] = $city[0];
+
+                                $SearchProvince[0]  = "不限";
+                            }
+
+                        }
+                    }
+                }
+
+
+//
+
+        $log->logs("省",$SearchProvince);
+        $log->logs("市",$SearchCity);
         //商品信息
         $ProductData = DB::table('product')
             ->join('business_user','business_user.id','=','product.business_id')
             ->where(['product.cat_id'=>$ApplyData['cat_id'],'product.is_del'=>0])
+            ->whereIn('product.province',$SearchProvince)
+//            ->whereIn('product.city',$SearchCity)
+//            ->where('product.city','like',"%$city%")
             ->select('product.*','business_user.number')
             ->get();
 
@@ -167,6 +225,8 @@ class ApplyForm extends Model{
                     $CheckProduct[$k]['rate'] = round(($successApply / $CheckProduct[$k]['count'])*100)  . "%";
                 }
             }
+
+//            $log->logs("go",$CheckProduct);
             //需求信息 需要对比的字段内容  需求信息全部一样所以不变
             $title = ['money','product_cycle','accrual','lending_type','lending_cycle'];
 
@@ -193,9 +253,9 @@ class ApplyForm extends Model{
             $needScoreAvg = 50/count($title);
 
             foreach($CheckProduct as $k=>$v){
+
                 foreach($new_title as $k1=>$v1){
                     try{
-
                             // 如果不是如易类
                             if($v1 == 'money'){
                                 if($v['money'] == "1-10万" || $v['money'] == "10-100万"){
@@ -311,7 +371,9 @@ class ApplyForm extends Model{
                             }else{
                                 if(($v[$v1] == $ContrastData[$v1]) && in_array($v1,$title) && ($v1 != 'money') && (($v1 != 'accrual'))){
                                     // 如果是在需求品字段数组内 且不是 money 匹配成功则 每一项匹配成功 +10
-                                    $CheckProduct[$k]['matching'] += $needScoreAvg;
+
+                                    // TODO::这里还要继续调整
+//                                    $CheckProduct[$k]['matching'] += $needScoreAvg;
                                 }else if(($v[$v1] == $ContrastData[$v1] && (!in_array($v1,$title)) && (in_array($v1,$new_title)))){
                                     // 如果在担保品字段数组内 剩余的50分 按照担保字段的数量进行平均分配 匹配成功则 +平均分
                                     $CheckProduct[$k]['matching'] += 50/$count;
@@ -329,22 +391,26 @@ class ApplyForm extends Model{
 
                 }
                 $CheckProduct[$k]['matching'] = ceil($CheckProduct[$k]['matching']);
-
+                
                 //匹配低于 规定的去除
                 if($CheckProduct[$k]['matching'] < $match_score){
                     unset($CheckProduct[$k]);
                 }else{
                     $CheckProduct[$k]['matching'] = $CheckProduct[$k]['matching'];
                     if(!empty($ApplyData['city'])){
-                        if($CheckProduct[$k]['district'] == $ApplyData['city']){
-                            $SameCity[] = $CheckProduct[$k];
-                        }else{
-                            $DifferentCity[] = $CheckProduct[$k];
-                        }
+//                        if($CheckProduct[$k]['district'] == $ApplyData['city']){
+//                            $SameCity[] = $CheckProduct[$k];
+//                        }else{
+//                            $DifferentCity[] = $CheckProduct[$k];
+//                        }
                     }
+//                    $SameCity[] = $CheckProduct[$k];
                 }
             }
+            // 原来这是用于定位后定位查询，现在不用了
 
+            $SameCity = $CheckProduct;
+//            $log->logs("产品",$CheckProduct);
             if(!empty($ApplyData['city'])){
                 // 根据用户定位对数据进行重新组合
                 if(!empty($SameCity) && (empty($DifferentCity))){
@@ -370,6 +436,8 @@ class ApplyForm extends Model{
             $CheckProduct = "";
         }
         $use_title = ['lending_type','property','accrual','product_cycle','is_home','is_home','company','matching','score','id','count','rate','order_id','other','audit_time','other_need'];
+
+
         if($type == 0){
             if($s){
                 $retArray['code'] = 200;
